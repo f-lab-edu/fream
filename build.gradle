@@ -4,6 +4,7 @@ plugins {
 	id 'org.asciidoctor.convert' version '1.5.8'
 	id 'java'
 	id 'groovy'
+	id 'checkstyle'
 }
 
 group = 'kr.flab'
@@ -25,8 +26,15 @@ ext {
 	set('testcontainersVersion', "1.15.3")
 }
 
+checkstyle {
+	maxWarnings = 0
+	configFile = file("${rootDir}/coding-style/google-checkstyle.xml")
+	configProperties = ["suppressionFile" : "${rootDir}/coding-style/checkstyle-suppressions.xml"]
+	showViolations = true
+	toolVersion = "8.45"
+}
+
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.liquibase:liquibase-core'

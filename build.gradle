@@ -34,6 +34,18 @@ checkstyle {
 	toolVersion = "8.45"
 }
 
+task prebuild() {
+    if (!file("./.git/hooks/precommit").exists()) {
+		copy {
+			from "./githooks/pre-commit"
+			into "./.git/hooks"
+		}
+	}
+}
+
+build.dependsOn prebuild
+
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'

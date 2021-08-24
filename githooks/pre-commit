@@ -1,0 +1,16 @@
+#!/bin/sh
+
+cd $(dirname ${BASH_SOURCE[0]}) && cd ../
+SCRIPT_DIR=`pwd`
+
+./gradlew check
+if [ $? -eq 0 ]; then
+  echo "============================================"
+  echo "Gradle Check task has successfully completed"
+  echo "============================================"
+else
+  echo "============================================"
+  echo "Fail to check Code style"
+  echo "============================================"
+  exit 1
+fi

@@ -1,4 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:tc:mysql:8:///fream?useSSL=false
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver

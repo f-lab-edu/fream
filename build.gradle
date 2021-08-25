@@ -70,7 +70,7 @@ dependencyManagement {
 
 test {
 	outputs.dir snippetsDir
-	useJUnitPlatform ()
+	useJUnitPlatform()
 }
 
 asciidoctor {

@@ -45,7 +45,6 @@ task prebuild() {
 
 build.dependsOn prebuild
 
-
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -73,7 +72,9 @@ dependencyManagement {
 
 test {
 	outputs.dir snippetsDir
-	useJUnitPlatform()
+	useJUnitPlatform {
+		jvmArgs "-Dspring.profiles.active=test"
+	}
 }
 
 asciidoctor {

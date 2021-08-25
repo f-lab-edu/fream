@@ -46,7 +46,7 @@ checkstyleMain.dependsOn preCheckStyle
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.liquibase:liquibase-core'
+	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
 	implementation 'org.codehaus.groovy:groovy:3.+'
 	compileOnly 'org.projectlombok:lombok'
@@ -70,9 +70,7 @@ dependencyManagement {
 
 test {
 	outputs.dir snippetsDir
-	useJUnitPlatform {
-		jvmArgs "-Dspring.profiles.active=test"
-	}
+	useJUnitPlatform ()
 }
 
 asciidoctor {

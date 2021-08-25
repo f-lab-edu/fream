@@ -1,16 +1,12 @@
 #!/bin/sh
 
-cd $(dirname ${BASH_SOURCE[0]}) && cd ../
-SCRIPT_DIR=`pwd`
+cd $(dirname ${BASH_SOURCE[0]}) && cd ../..
+SCRIPT_DIR=$(pwd)
 
-./gradlew check
+./gradlew build -x test
 if [ $? -eq 0 ]; then
-  echo "============================================"
-  echo "Gradle Check task has successfully completed"
-  echo "============================================"
+  echo "Checking the project integrity has been completed."
 else
-  echo "============================================"
-  echo "Fail to check Code style"
-  echo "============================================"
+  echo "Fail to check the project integrity."
   exit 1
 fi

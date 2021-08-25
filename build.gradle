@@ -34,22 +34,19 @@ checkstyle {
 	toolVersion = "8.45"
 }
 
-task prebuild() {
-    if (!file("./.git/hooks/precommit").exists()) {
-		copy {
-			from "./githooks/pre-commit"
-			into "./.git/hooks"
-		}
+task preCheckStyle() {
+	copy {
+		from "./githooks/pre-commit"
+		into "./.git/hooks"
 	}
 }
 
-build.dependsOn prebuild
-
+checkstyleMain.dependsOn preCheckStyle
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.liquibase:liquibase-core'
+	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
 	implementation 'org.codehaus.groovy:groovy:3.+'
 	compileOnly 'org.projectlombok:lombok'

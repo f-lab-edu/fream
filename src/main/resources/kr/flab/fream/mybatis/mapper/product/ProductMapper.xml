@@ -4,17 +4,14 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="kr.flab.fream.mybatis.mapper.product.ProductMapper">
-  <insert id="addProduct"
-    keyProperty="id"
-    parameterType="kr.flab.fream.domain.product.Product"
-    useGeneratedKeys="true">
-    INSERT INTO product (name, english_name, product_code, release_date,
-                         retail_price, brand_id, category)
-    VALUES (#{name}, #{englishName}, #{details.productCode}, #{details.releaseDate},
-            #{details.retailPrice}, #{brand.id}, #{category})
-  </insert>
 
   <resultMap id="productResultMap" type="kr.flab.fream.domain.product.Product">
+    <id column="id" property="id"/>
+    <result column="name" property="name"/>
+    <result column="english_name" property="englishName"/>
+    <result column="category" javaType="kr.flab.fream.domain.product.Category" jdbcType="VARCHAR"
+      property="category"
+      typeHandler="kr.flab.fream.mybatis.typehandler.CategoryTypeHandler"/>
     <association javaType="kr.flab.fream.domain.product.ProductDetails" property="details">
       <result column="product_code" property="productCode"/>
       <result column="release_date" property="releaseDate"/>
@@ -30,14 +27,17 @@
       <id column="size_id" property="id"/>
       <result column="size_name" property="name"/>
     </collection>
-    <id column="id" property="id"/>
-    <result column="name" property="name"/>
-    <result column="english_name" property="englishName"/>
-    <result column="category" javaType="kr.flab.fream.domain.product.Category" jdbcType="VARCHAR"
-      property="category"
-      typeHandler="kr.flab.fream.mybatis.typehandler.CategoryTypeHandler"/>
   </resultMap>
 
+  <insert id="addProduct"
+    keyProperty="id"
+    parameterType="kr.flab.fream.domain.product.Product"
+    useGeneratedKeys="true">
+    INSERT INTO product (name, english_name, product_code, release_date,
+                         retail_price, brand_id, category)
+    VALUES (#{name}, #{englishName}, #{details.productCode}, #{details.releaseDate},
+            #{details.retailPrice}, #{brand.id}, #{category})
+  </insert>
   <select id="getProductById" resultMap="productResultMap">
     SELECT p.id           AS id,
            p.name         AS name,

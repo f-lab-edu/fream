@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.flab.fream.mybatis.mapper.product.BrandMapper">
+
+  <insert id="addBrand"
+    keyProperty="id"
+    parameterType="kr.flab.fream.domain.product.Brand"
+    useGeneratedKeys="true">
+    INSERT INTO brand (name, english_name)
+    VALUES (#{name}, #{englishName})
+  </insert>
+
+  <insert id="addBrands" keyProperty="id" parameterType="List" useGeneratedKeys="true">
+    INSERT INTO brand (name, english_name)
+    VALUES
+    <foreach collection="brands" item="item" separator=",">
+      (#{item.name}, #{item.englishName})
+    </foreach>
+  </insert>
+
+</mapper>

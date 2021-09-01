@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.flab.fream.mybatis.mapper.product.ProductSizeMapper">
+
+  <insert id="mapSizesToProduct"
+    parameterType="kr.flab.fream.domain.product.Product">
+    INSERT INTO product_size (product_id, size_id)
+    VALUES
+    <foreach collection="sizes.sizeList" item="item" separator=",">
+      (#{id}, #{item.id})
+    </foreach>
+  </insert>
+
+</mapper>

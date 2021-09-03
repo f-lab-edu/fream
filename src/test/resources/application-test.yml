@@ -3,7 +3,9 @@ spring:
     schemas: fream
     locations:
       - classpath:db/migration
+      - classpath:db/migration-test
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
     use-generated-keys: true
+

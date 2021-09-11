@@ -5,6 +5,7 @@ plugins {
 	id 'java'
 	id 'groovy'
 	id 'checkstyle'
+	id 'jacoco'
 }
 
 group = 'kr.flab'
@@ -26,6 +27,8 @@ ext {
 	set('testcontainersVersion', "1.15.3")
 }
 
+// CheckStyle Configurations
+
 checkstyle {
 	maxWarnings = 0
 	configFile = file("${rootDir}/coding-style/google-checkstyle.xml")
@@ -42,6 +45,53 @@ task preCheckStyle() {
 }
 
 checkstyleMain.dependsOn preCheckStyle
+
+// Jacoco Configurations
+
+def jacocoExcludes = [
+	'**/mybatis/typehandler/**',
+	'**/FreamApplication.class'
+]
+
+tasks.jacocoTestReport {
+	reports {
+		csv.enabled(true)
+		
+	}
+	afterEvaluate {
+		getClassDirectories().setFrom(classDirectories.files.collect {
+			fileTree(dir: it, exclude: jacocoExcludes)
+		})
+	}
+}
+
+jacocoTestCoverageVerification {
+
+	violationRules {
+		rule {
+			element = 'CLASS'
+			limit {
+				counter = 'BRANCH'
+				minimum = 1.0
+			}
+		}
+		rule {
+			element = 'CLASS'
+			limit {
+				counter = 'LINE'
+				minimum = 1.0
+			}
+		}
+	}
+	afterEvaluate {
+		getClassDirectories().setFrom(classDirectories.files.collect {
+			fileTree(dir: it, exclude: jacocoExcludes)
+		})
+	}
+}
+
+test.finalizedBy jacocoTestReport
+check.dependsOn jacocoTestCoverageVerification
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -75,6 +125,9 @@ dependencyManagement {
 test {
 	outputs.dir snippetsDir
 	useJUnitPlatform()
+	jacoco {
+		excludes += jacocoExcludes
+	}
 }
 
 asciidoctor {

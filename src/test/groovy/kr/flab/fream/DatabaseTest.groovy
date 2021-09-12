@@ -10,7 +10,8 @@ class DatabaseTest extends Specification {
 
     @Shared
     static final def MYSQL = new MySQLContainer("mysql:8")
-            .withDatabaseName("fream")
+        .withConfigurationOverride("db/mysql/conf.d")
+        .withDatabaseName("fream")
 
     static {
         MYSQL.start()

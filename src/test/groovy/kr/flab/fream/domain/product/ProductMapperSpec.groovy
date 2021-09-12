@@ -1,6 +1,6 @@
 package kr.flab.fream.domain.product
 
-import kr.flab.fream.DatabaseTest
+
 import kr.flab.fream.domain.product.model.*
 import kr.flab.fream.mybatis.mapper.product.BrandMapper
 import kr.flab.fream.mybatis.mapper.product.ProductMapper
@@ -10,6 +10,7 @@ import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguratio
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
+import spock.lang.Specification
 
 import java.time.LocalDate
 import java.time.Month
@@ -21,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat
 
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class ProductMapperSpec extends DatabaseTest {
+class ProductMapperSpec extends Specification {
 
     @Autowired
     ProductMapper productMapper
@@ -31,6 +32,11 @@ class ProductMapperSpec extends DatabaseTest {
     SizeMapper sizeMapper
     @Autowired
     ProductSizeMapper productSizeMapper
+
+    static def sneakers(Brand brand, Sizes sizes) {
+        def details = new ProductDetails("ABCD-1234", LocalDate.of(2021, Month.AUGUST, 28), 239_000)
+        return new Product(null, "신발", "sneakers", Category.SNEAKERS, details, brand, sizes)
+    }
 
     def "save Product"() {
         given:
@@ -69,8 +75,36 @@ class ProductMapperSpec extends DatabaseTest {
         assertThat(actual).usingRecursiveComparison(config).isEqualTo(sneakers)
     }
 
-    static def sneakers(Brand brand, Sizes sizes) {
-        def details = new ProductDetails("ABCD-1234", LocalDate.of(2021, Month.AUGUST, 28), 239_000)
-        return new Product(null, "신발", "sneakers", Category.SNEAKERS, details, brand, sizes)
+    // 아래 테스트 케이스들은 seed data 를 사용함. resources/db/migration-seed 데이터 확인
+
+    def "search Nike products"() {
+        given:
+        def actual = productMapper.search(Keyword.of(str))
+
+        expect:
+        actual.size() == 6
+
+        where:
+        str << ['나이키', 'nike']
     }
+
+    def "search Off-White products"() {
+        given:
+        def actual = productMapper.search(Keyword.of(str))
+
+        expect:
+        actual.size() == 2
+
+        where:
+        str << ['오프화이트', 'off-white']
+    }
+
+    def "search NB 992 product"() {
+        given:
+        def actual = productMapper.search(Keyword.of("992"))
+
+        expect:
+        actual.size() == 1
+    }
+
 }

@@ -40,6 +40,7 @@
         VALUES (#{name}, #{englishName}, #{details.productCode}, #{details.releaseDate},
                 #{details.retailPrice}, #{brand.id}, #{category})
     </insert>
+
     <select id="getProductById" resultMap="productResultMap">
         SELECT p.id           AS id,
                p.name         AS name,
@@ -58,6 +59,28 @@
                  JOIN product_size ps ON p.id = ps.product_id
                  JOIN size s ON s.id = ps.size_id
         WHERE p.id = #{id}
+    </select>
+
+    <select id="search"
+        parameterType="kr.flab.fream.domain.product.Keyword"
+        resultType="java.util.List" resultMap="productResultMap">
+        SELECT p.id           AS id,
+               p.name         AS name,
+               p.english_name AS english_name,
+               p.category     AS category,
+               p.product_code AS product_code,
+               p.release_date AS release_date,
+               p.retail_price AS retail_price,
+               b.id           AS brand_id,
+               b.name         AS brand_name,
+               b.english_name AS brand_english_name,
+               s.id           AS size_id,
+               s.name         AS size_name
+        FROM product AS p
+                 JOIN brand AS b ON p.brand_id = b.id
+                 JOIN product_size ps ON p.id = ps.product_id
+                 JOIN size s ON s.id = ps.size_id
+        WHERE MATCH(p.name, p.english_name) AGAINST('\"${keyword}\"' IN BOOLEAN MODE)
     </select>
 
 </mapper>

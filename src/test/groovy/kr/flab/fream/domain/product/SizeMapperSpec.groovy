@@ -1,6 +1,7 @@
 package kr.flab.fream.domain.product
 
 import kr.flab.fream.DatabaseTest
+import kr.flab.fream.domain.product.model.Size
 import kr.flab.fream.mybatis.mapper.product.SizeMapper
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
 import org.springframework.beans.factory.annotation.Autowired

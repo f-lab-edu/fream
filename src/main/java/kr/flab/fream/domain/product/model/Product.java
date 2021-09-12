@@ -1,4 +1,4 @@
-package kr.flab.fream.domain.product;
+package kr.flab.fream.domain.product.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,7 +1,7 @@
 package kr.flab.fream.mybatis.mapper.product;
 
-import kr.flab.fream.domain.product.Product;
-import kr.flab.fream.domain.product.Size;
+import kr.flab.fream.domain.product.model.Product;
+import kr.flab.fream.domain.product.model.Size;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

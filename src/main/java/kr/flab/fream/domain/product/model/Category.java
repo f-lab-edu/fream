@@ -1,4 +1,4 @@
-package kr.flab.fream.domain.product;
+package kr.flab.fream.domain.product.model;
 
 import java.util.Arrays;
 import lombok.AccessLevel;
@@ -44,9 +44,9 @@ public enum Category {
      */
     public static Category of(String categoryString) {
         return Arrays.stream(Category.values())
-            .filter(category -> category.name().equalsIgnoreCase(categoryString))
-            .findAny()
-            .orElseThrow();
+                .filter(category -> category.name().equalsIgnoreCase(categoryString))
+                .findAny()
+                .orElseThrow();
     }
 
 }

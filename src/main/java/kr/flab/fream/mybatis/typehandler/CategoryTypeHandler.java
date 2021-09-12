@@ -4,7 +4,7 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import kr.flab.fream.domain.product.Category;
+import kr.flab.fream.domain.product.model.Category;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
@@ -17,7 +17,7 @@ public class CategoryTypeHandler implements TypeHandler<Category> {
 
     @Override
     public void setParameter(PreparedStatement ps, int i, Category parameter, JdbcType jdbcType)
-                throws SQLException {
+            throws SQLException {
         ps.setString(i, parameter.name());
     }
 

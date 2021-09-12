@@ -1,6 +1,7 @@
 package kr.flab.fream.domain.product
 
 import kr.flab.fream.DatabaseTest
+import kr.flab.fream.domain.product.model.Sizes
 import kr.flab.fream.mybatis.mapper.product.BrandMapper
 import kr.flab.fream.mybatis.mapper.product.ProductMapper
 import kr.flab.fream.mybatis.mapper.product.ProductSizeMapper

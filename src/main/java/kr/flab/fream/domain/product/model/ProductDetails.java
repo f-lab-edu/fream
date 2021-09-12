@@ -1,4 +1,4 @@
-package kr.flab.fream.domain.product;
+package kr.flab.fream.domain.product.model;
 
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;

@@ -6,6 +6,7 @@ plugins {
 	id 'groovy'
 	id 'checkstyle'
 	id 'jacoco'
+	id 'java-test-fixtures'
 }
 
 group = 'kr.flab'
@@ -33,6 +34,7 @@ checkstyle {
 	maxWarnings = 0
 	configFile = file("${rootDir}/coding-style/google-checkstyle.xml")
 	configProperties = ["suppressionFile" : "${rootDir}/coding-style/checkstyle-suppressions.xml"]
+    sourceSets = [project.sourceSets.main]
 	showViolations = true
 	toolVersion = "8.45"
 }

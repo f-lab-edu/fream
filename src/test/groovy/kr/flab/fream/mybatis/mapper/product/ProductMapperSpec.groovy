@@ -1,28 +1,22 @@
-package kr.flab.fream.domain.product
+package kr.flab.fream.mybatis.mapper.product
 
-
-import kr.flab.fream.domain.product.model.*
-import kr.flab.fream.mybatis.mapper.product.BrandMapper
-import kr.flab.fream.mybatis.mapper.product.ProductMapper
-import kr.flab.fream.mybatis.mapper.product.ProductSizeMapper
-import kr.flab.fream.mybatis.mapper.product.SizeMapper
+import kr.flab.domain.product.BrandFixtures
+import kr.flab.domain.product.ProductFixtures
+import kr.flab.domain.product.SizeFixtures
+import kr.flab.fream.DatabaseTest
+import kr.flab.fream.domain.product.Keyword
+import kr.flab.fream.domain.product.model.Sizes
+import kr.flab.fream.mybatis.util.ExtendedRowBounds
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import spock.lang.Specification
 
-import java.time.LocalDate
-import java.time.Month
-
-import static kr.flab.fream.domain.product.BrandMapperSpec.brand
-import static kr.flab.fream.domain.product.SizeMapperSpec.us85Size
-import static kr.flab.fream.domain.product.SizeMapperSpec.us8Size
 import static org.assertj.core.api.Assertions.assertThat
 
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class ProductMapperSpec extends Specification {
+class ProductMapperSpec extends DatabaseTest {
 
     @Autowired
     ProductMapper productMapper
@@ -33,20 +27,15 @@ class ProductMapperSpec extends Specification {
     @Autowired
     ProductSizeMapper productSizeMapper
 
-    static def sneakers(Brand brand, Sizes sizes) {
-        def details = new ProductDetails("ABCD-1234", LocalDate.of(2021, Month.AUGUST, 28), 239_000)
-        return new Product(null, "신발", "sneakers", Category.SNEAKERS, details, brand, sizes)
-    }
-
     def "save Product"() {
         given:
-        def size = us8Size()
-        def nike = brand()
+        def size = SizeFixtures.createUs8Size()
+        def brand = BrandFixtures.createBrand()
         def sizes = new Sizes(Arrays.asList(size))
-        def sneakers = sneakers(nike, sizes)
+        def sneakers = ProductFixtures.createSneakers(brand, sizes)
 
         sizeMapper.addSize(size)
-        brandMapper.addBrand(nike)
+        brandMapper.addBrand(brand)
 
         expect:
         productMapper.addProduct(sneakers) == 1
@@ -54,15 +43,15 @@ class ProductMapperSpec extends Specification {
 
     def "get Product by ID"() {
         given:
-        def size = us8Size()
-        def size2 = us85Size()
-        def nike = brand()
+        def size = SizeFixtures.createUs8Size()
+        def size2 = SizeFixtures.createUs85Size()
+        def brand = BrandFixtures.createBrand()
         def sizes = new Sizes(Arrays.asList(size, size2))
-        def sneakers = sneakers(nike, sizes)
+        def sneakers = ProductFixtures.createSneakers(brand, sizes)
 
         sizeMapper.addSize(size)
         sizeMapper.addSize(size2)
-        brandMapper.addBrand(nike)
+        brandMapper.addBrand(brand)
         productMapper.addProduct(sneakers)
         productSizeMapper.mapSizesToProduct(sneakers)
 
@@ -107,4 +96,14 @@ class ProductMapperSpec extends Specification {
         actual.size() == 1
     }
 
+    def "get Products with Pagination"() {
+        given:
+        def rowBounds = ExtendedRowBounds.of(0, 10)
+
+        when:
+        def products = productMapper.getProducts(rowBounds)
+
+        then:
+        products.size() == 10
+    }
 }

@@ -1,7 +1,7 @@
-package kr.flab.fream.domain.product
+package kr.flab.fream.mybatis.mapper.product
 
+import kr.flab.domain.product.SizeFixtures
 import kr.flab.fream.DatabaseTest
-import kr.flab.fream.domain.product.model.Size
 import kr.flab.fream.mybatis.mapper.product.SizeMapper
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,7 +16,7 @@ class SizeMapperSpec extends DatabaseTest {
 
     def "save Size"() {
         given:
-        def size = us8Size()
+        def size = SizeFixtures.createUs8Size()
 
         expect:
         sizeMapper.addSize(size)
@@ -25,22 +25,14 @@ class SizeMapperSpec extends DatabaseTest {
 
     def "save a list of Sizes"() {
         given:
-        def size1 = us8Size()
-        def size2 = us85Size()
+        def size1 = SizeFixtures.createUs8Size()
+        def size2 = SizeFixtures.createUs85Size()
         def sizes = Arrays.asList(size1, size2)
 
         expect:
         sizeMapper.addSizes(sizes) == 2
         size1.id != null
         size2.id != null
-    }
-
-    static def us8Size() {
-        return new Size(null, "US 8.0")
-    }
-
-    static def us85Size() {
-        return new Size(null, "US 8.5")
     }
 
 }

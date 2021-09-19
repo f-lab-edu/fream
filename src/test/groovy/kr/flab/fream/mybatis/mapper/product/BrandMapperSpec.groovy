@@ -1,5 +1,6 @@
-package kr.flab.fream.domain.product
+package kr.flab.fream.mybatis.mapper.product
 
+import kr.flab.domain.product.BrandFixtures
 import kr.flab.fream.DatabaseTest
 import kr.flab.fream.domain.product.model.Brand
 import kr.flab.fream.mybatis.mapper.product.BrandMapper
@@ -28,16 +29,12 @@ class BrandMapperSpec extends DatabaseTest {
 
     def "save Brand"() {
         given:
-        def brand = brand()
+        def brand = BrandFixtures.createBrand()
 
         when:
         brandMapper.addBrand(brand)
 
         then:
         brand.getId() != null
-    }
-
-    static def brand() {
-        return new Brand(null, "brand", "brand")
     }
 }

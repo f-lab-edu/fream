@@ -61,8 +61,13 @@
         WHERE p.id = #{id}
     </select>
 
+    <select id="getProducts"
+        resultType="java.util.List" resultMap="productResultMap">
+        SELECT * FROM product;
+    </select>
+
     <select id="search"
-        parameterType="kr.flab.fream.domain.product.Keyword"
+        parameterType="kr.flab.fream.domain.product.SearchOption"
         resultType="java.util.List" resultMap="productResultMap">
         SELECT p.id           AS id,
                p.name         AS name,
@@ -76,11 +81,19 @@
                b.english_name AS brand_english_name,
                s.id           AS size_id,
                s.name         AS size_name
-        FROM product AS p
-                 JOIN brand AS b ON p.brand_id = b.id
-                 JOIN product_size ps ON p.id = ps.product_id
-                 JOIN size s ON s.id = ps.size_id
-        WHERE MATCH(p.name, p.english_name) AGAINST('\"${keyword}\"' IN BOOLEAN MODE)
+        FROM (
+            SELECT *
+            FROM product
+            <if test="keyword.value != null">
+                WHERE MATCH(name, english_name) AGAINST('\"${keyword.value}\"' IN BOOLEAN MODE)
+            </if>
+            <if test="rowBounds != null">
+                LIMIT ${rowBounds.limit} OFFSET ${rowBounds.offset}
+            </if>
+        ) AS p
+            JOIN brand AS b ON p.brand_id = b.id
+            JOIN product_size ps ON p.id = ps.product_id
+            JOIN size s ON s.id = ps.size_id
     </select>
 
 </mapper>

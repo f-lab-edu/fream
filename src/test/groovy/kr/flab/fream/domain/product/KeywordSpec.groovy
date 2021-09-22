@@ -4,7 +4,7 @@ import spock.lang.Specification
 
 class KeywordSpec extends Specification {
 
-    def "'Keyword' must be a string of at least two letters"() {
+    def "'Keyword' must be a string of at least two letters or null"() {
         when:
         Keyword.of(str)
 
@@ -12,7 +12,7 @@ class KeywordSpec extends Specification {
         notThrown(IllegalArgumentException)
 
         where:
-        str << ['as', 'of', 'nike', '레고', '아디다스']
+        str << ['as', 'of', 'nike', '레고', '아디다스', null]
     }
 
     def "Strings less than two letters or null cannot be 'Keyword'"() {
@@ -23,7 +23,7 @@ class KeywordSpec extends Specification {
         thrown(IllegalArgumentException)
 
         where:
-        str << ['a', '가', null]
+        str << ['a', '가', '']
     }
 
 }

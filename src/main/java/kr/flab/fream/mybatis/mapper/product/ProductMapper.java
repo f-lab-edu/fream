@@ -2,8 +2,10 @@ package kr.flab.fream.mybatis.mapper.product;
 
 import java.util.List;
 import kr.flab.fream.domain.product.Keyword;
+import kr.flab.fream.domain.product.SearchOption;
 import kr.flab.fream.domain.product.model.Product;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.session.RowBounds;
 
 /**
  * {@link Product} 클래스의 매퍼.
@@ -17,6 +19,6 @@ public interface ProductMapper {
 
     int addProduct(Product product);
 
-    List<Product> search(Keyword keyword);
+    List<Product> search(SearchOption searchOption);
 
 }

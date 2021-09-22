@@ -4,9 +4,8 @@ import kr.flab.domain.product.BrandFixtures
 import kr.flab.domain.product.ProductFixtures
 import kr.flab.domain.product.SizeFixtures
 import kr.flab.fream.DatabaseTest
-import kr.flab.fream.domain.product.Keyword
+import kr.flab.fream.domain.product.SearchOption
 import kr.flab.fream.domain.product.model.Sizes
-import kr.flab.fream.mybatis.util.ExtendedRowBounds
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
 import org.springframework.beans.factory.annotation.Autowired
@@ -68,7 +67,7 @@ class ProductMapperSpec extends DatabaseTest {
 
     def "search Nike products"() {
         given:
-        def actual = productMapper.search(Keyword.of(str))
+        def actual = productMapper.search(createSearchOption(str, 1))
 
         expect:
         actual.size() == 6
@@ -79,7 +78,7 @@ class ProductMapperSpec extends DatabaseTest {
 
     def "search Off-White products"() {
         given:
-        def actual = productMapper.search(Keyword.of(str))
+        def actual = productMapper.search(createSearchOption(str, 1))
 
         expect:
         actual.size() == 2
@@ -90,7 +89,7 @@ class ProductMapperSpec extends DatabaseTest {
 
     def "search NB 992 product"() {
         given:
-        def actual = productMapper.search(Keyword.of("992"))
+        def actual = productMapper.search(createSearchOption("992", 1))
 
         expect:
         actual.size() == 1
@@ -98,12 +97,17 @@ class ProductMapperSpec extends DatabaseTest {
 
     def "get Products with Pagination"() {
         given:
-        def rowBounds = ExtendedRowBounds.of(0, 10)
+        def searchOption = createSearchOption(null, 1)
 
         when:
-        def products = productMapper.getProducts(rowBounds)
+        def products = productMapper.search(searchOption)
 
         then:
         products.size() == 10
     }
+
+    private static SearchOption createSearchOption(String keyword, int page) {
+        return SearchOption.of(keyword, page)
+    }
+
 }

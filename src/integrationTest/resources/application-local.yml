@@ -1,0 +1,15 @@
+spring:
+  flyway:
+    schemas: fream
+    locations:
+      - classpath:db/migration
+      - classpath:db/migration-seed
+  datasource:
+    url: jdbc:mysql://localhost:3306/fream?useSSL=false&allowPublicKeyRetrieval=true
+    username: test
+    password: test
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    use-generated-keys: true
+

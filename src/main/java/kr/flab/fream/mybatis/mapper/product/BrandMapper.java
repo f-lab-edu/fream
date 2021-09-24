@@ -1,7 +1,7 @@
 package kr.flab.fream.mybatis.mapper.product;
 
 import java.util.List;
-import kr.flab.fream.domain.product.Brand;
+import kr.flab.fream.domain.product.model.Brand;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

@@ -1,61 +1,99 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="kr.flab.fream.mybatis.mapper.product.ProductMapper">
 
-  <resultMap id="productResultMap" type="kr.flab.fream.domain.product.Product">
-    <id column="id" property="id"/>
-    <result column="name" property="name"/>
-    <result column="english_name" property="englishName"/>
-    <result column="category" javaType="kr.flab.fream.domain.product.Category" jdbcType="VARCHAR"
-      property="category"
-      typeHandler="kr.flab.fream.mybatis.typehandler.CategoryTypeHandler"/>
-    <association javaType="kr.flab.fream.domain.product.ProductDetails" property="details">
-      <result column="product_code" property="productCode"/>
-      <result column="release_date" property="releaseDate"/>
-      <result column="retail_price" property="retailPrice"/>
-    </association>
-    <association javaType="kr.flab.fream.domain.product.Brand" property="brand">
-      <id column="brand_id" property="id"/>
-      <result column="brand_name" property="name"/>
-      <result column="brand_english_name" property="englishName"/>
-    </association>
-    <collection javaType="ArrayList" ofType="kr.flab.fream.domain.product.Size"
-      property="sizes.sizeList">
-      <id column="size_id" property="id"/>
-      <result column="size_name" property="name"/>
-    </collection>
-  </resultMap>
+    <resultMap id="productResultMap" type="kr.flab.fream.domain.product.model.Product">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="english_name" property="englishName"/>
+        <result column="category" javaType="kr.flab.fream.domain.product.model.Category"
+            jdbcType="VARCHAR"
+            property="category"
+            typeHandler="kr.flab.fream.mybatis.typehandler.CategoryTypeHandler"/>
+        <association javaType="kr.flab.fream.domain.product.model.ProductDetails"
+            property="details">
+            <result column="product_code" property="productCode"/>
+            <result column="release_date" property="releaseDate"/>
+            <result column="retail_price" property="retailPrice"/>
+        </association>
+        <association javaType="kr.flab.fream.domain.product.model.Brand" property="brand">
+            <id column="brand_id" property="id"/>
+            <result column="brand_name" property="name"/>
+            <result column="brand_english_name" property="englishName"/>
+        </association>
+        <collection javaType="ArrayList" ofType="kr.flab.fream.domain.product.model.Size"
+            property="sizes.sizeList">
+            <id column="size_id" property="id"/>
+            <result column="size_name" property="name"/>
+        </collection>
+    </resultMap>
 
-  <insert id="addProduct"
-    keyProperty="id"
-    parameterType="kr.flab.fream.domain.product.Product"
-    useGeneratedKeys="true">
-    INSERT INTO product (name, english_name, product_code, release_date,
-                         retail_price, brand_id, category)
-    VALUES (#{name}, #{englishName}, #{details.productCode}, #{details.releaseDate},
-            #{details.retailPrice}, #{brand.id}, #{category})
-  </insert>
-  <select id="getProductById" resultMap="productResultMap">
-    SELECT p.id           AS id,
-           p.name         AS name,
-           p.english_name AS english_name,
-           p.category     AS category,
-           p.product_code AS product_code,
-           p.release_date AS release_date,
-           p.retail_price AS retail_price,
-           b.id           AS brand_id,
-           b.name         AS brand_name,
-           b.english_name AS brand_english_name,
-           s.id           AS size_id,
-           s.name         AS size_name
-    FROM product AS p
-           JOIN brand AS b ON p.brand_id = b.id
-           JOIN product_size ps ON p.id = ps.product_id
-           JOIN size s ON s.id = ps.size_id
-    WHERE p.id = #{id}
-  </select>
+    <insert id="addProduct"
+        keyProperty="id"
+        parameterType="kr.flab.fream.domain.product.model.Product"
+        useGeneratedKeys="true">
+        INSERT INTO product (name, english_name, product_code, release_date,
+                             retail_price, brand_id, category)
+        VALUES (#{name}, #{englishName}, #{details.productCode}, #{details.releaseDate},
+                #{details.retailPrice}, #{brand.id}, #{category})
+    </insert>
+
+    <select id="getProductById" resultMap="productResultMap">
+        SELECT p.id           AS id,
+               p.name         AS name,
+               p.english_name AS english_name,
+               p.category     AS category,
+               p.product_code AS product_code,
+               p.release_date AS release_date,
+               p.retail_price AS retail_price,
+               b.id           AS brand_id,
+               b.name         AS brand_name,
+               b.english_name AS brand_english_name,
+               s.id           AS size_id,
+               s.name         AS size_name
+        FROM product AS p
+                 JOIN brand AS b ON p.brand_id = b.id
+                 JOIN product_size ps ON p.id = ps.product_id
+                 JOIN size s ON s.id = ps.size_id
+        WHERE p.id = #{id}
+    </select>
+
+    <select id="getProducts"
+        resultType="java.util.List" resultMap="productResultMap">
+        SELECT * FROM product;
+    </select>
+
+    <select id="search"
+        parameterType="kr.flab.fream.domain.product.SearchOption"
+        resultType="java.util.List" resultMap="productResultMap">
+        SELECT p.id           AS id,
+               p.name         AS name,
+               p.english_name AS english_name,
+               p.category     AS category,
+               p.product_code AS product_code,
+               p.release_date AS release_date,
+               p.retail_price AS retail_price,
+               b.id           AS brand_id,
+               b.name         AS brand_name,
+               b.english_name AS brand_english_name,
+               s.id           AS size_id,
+               s.name         AS size_name
+        FROM (
+            SELECT *
+            FROM product
+            <if test="keyword.value != null">
+                WHERE MATCH(name, english_name) AGAINST('\"${keyword.value}\"' IN BOOLEAN MODE)
+            </if>
+            <if test="rowBounds != null">
+                LIMIT ${rowBounds.limit} OFFSET ${rowBounds.offset}
+            </if>
+        ) AS p
+            JOIN brand AS b ON p.brand_id = b.id
+            JOIN product_size ps ON p.id = ps.product_id
+            JOIN size s ON s.id = ps.size_id
+    </select>
 
 </mapper>

@@ -1,6 +1,8 @@
-package kr.flab.fream.domain.product
+package kr.flab.fream.mybatis.mapper.product
 
+import kr.flab.domain.product.BrandFixtures
 import kr.flab.fream.DatabaseTest
+import kr.flab.fream.domain.product.model.Brand
 import kr.flab.fream.mybatis.mapper.product.BrandMapper
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,8 +18,8 @@ class BrandMapperSpec extends DatabaseTest {
     def "save a list of Brands"() {
         given:
         List<Brand> brands = Arrays.asList(
-                new Brand(null, "brand1", "brand1"),
-                new Brand(null, "brand2", "brand2"),
+            new Brand(null, "brand1", "brand1"),
+            new Brand(null, "brand2", "brand2"),
         )
 
         expect:
@@ -27,16 +29,12 @@ class BrandMapperSpec extends DatabaseTest {
 
     def "save Brand"() {
         given:
-        def brand = brand()
+        def brand = BrandFixtures.createBrand()
 
         when:
         brandMapper.addBrand(brand)
 
         then:
         brand.getId() != null
-    }
-
-    static def brand() {
-        return new Brand(null, "brand", "brand")
     }
 }

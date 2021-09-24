@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS brand
 (
     id           BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name         VARCHAR(128) NOT NULL UNIQUE,
-    english_name VARCHAR(128) NOT NULL
+    english_name VARCHAR(128) NOT NULL,
+    FULLTEXT INDEX fx_keywords (name, english_name) WITH PARSER ngram
 );
 
 CREATE TABLE IF NOT EXISTS size
@@ -22,7 +23,8 @@ CREATE TABLE IF NOT EXISTS product
     brand_id     BIGINT       NOT NULL,
     category     VARCHAR(32)  NOT NULL,
 
-    FOREIGN KEY (brand_id) REFERENCES brand (id)
+    FOREIGN KEY (brand_id) REFERENCES brand (id),
+    FULLTEXT INDEX fx_keywords (name, english_name) WITH PARSER ngram
 );
 
 CREATE TABLE IF NOT EXISTS product_size

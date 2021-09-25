@@ -42,10 +42,10 @@ public enum Category {
         this.parent = parent;
         this.name = name;
         this.children = new HashSet<>();
-        setChildren(this.parent);
+        setChildren();
     }
 
-    private void setChildren(Category parent) {
+    private void setChildren() {
         if (this.parent != null) {
             this.parent.children.add(this);
         }
@@ -72,21 +72,7 @@ public enum Category {
      * @since 1.0.0
      */
     public Set<Category> getAllChildren() {
-        Set<Category> res = new HashSet<>();
-
-        for (final var child : this.children) {
-            getAllChildrenHelper(res, child);
-            res.add(child);
-        }
-
-        return res;
-    }
-
-    private void getAllChildrenHelper(Set<Category> container, Category currentCategory) {
-        for (final var child : currentCategory.children) {
-            getAllChildrenHelper(container, child);
-            container.add(child);
-        }
+        return Set.copyOf(this.children);
     }
 
 }

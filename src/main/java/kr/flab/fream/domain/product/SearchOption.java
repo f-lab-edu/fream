@@ -7,6 +7,7 @@ import kr.flab.fream.domain.product.model.Category;
 import kr.flab.fream.mybatis.util.ExtendedRowBounds;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.RowBounds;
 
@@ -33,15 +34,45 @@ public class SearchOption {
      */
     public static SearchOption of(@Nullable String keywordString, @Nullable Integer page,
             @Nullable String categoryStr) {
-        final var keyword = Keyword.of(keywordString);
-        final var rowBounds = ExtendedRowBounds.of(page);
-        Set<Category> categories = new HashSet<>();
-        if (categoryStr != null) {
-            final var category = Category.of(categoryStr);
-            categories = category.getAllChildren();
-            categories.add(category);
+        return new SearchOptionBuilder()
+                .keyword(keywordString)
+                .rowBounds(page)
+                .categories(categoryStr)
+                .build();
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    private static class SearchOptionBuilder {
+
+        private Keyword keyword;
+        private RowBounds rowBounds;
+        private Set<Category> categories = new HashSet<>();
+
+        private SearchOptionBuilder keyword(String keywordString) {
+            this.keyword = Keyword.of(keywordString);
+            return this;
         }
-        return new SearchOption(keyword, rowBounds, categories);
+
+        private SearchOptionBuilder rowBounds(Integer page) {
+            this.rowBounds = ExtendedRowBounds.of(page);
+            return this;
+        }
+
+        private SearchOptionBuilder categories(String categoryString) {
+            if (categoryString == null) {
+                return this;
+            }
+
+            final var category = Category.of(categoryString);
+            this.categories = new HashSet<>(category.getAllChildren());
+            this.categories.add(category);
+
+            return this;
+        }
+
+        private SearchOption build() {
+            return new SearchOption(this.keyword, this.rowBounds, this.categories);
+        }
     }
 
 }

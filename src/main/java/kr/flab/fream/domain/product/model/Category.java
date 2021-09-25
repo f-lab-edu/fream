@@ -1,8 +1,8 @@
 package kr.flab.fream.domain.product.model;
 
 import java.util.Arrays;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
  *
  * @since 1.0
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum Category {
 
     SNEAKERS(null, "스니커즈"),
@@ -36,17 +35,57 @@ public enum Category {
     private final Category parent;
     private final String name;
 
+    private final Set<Category> children;
+
+    Category(Category parent, String name) {
+        this.parent = parent;
+        this.name = name;
+        this.children = new HashSet<>();
+        setChildren(this.parent);
+    }
+
+    private void setChildren(Category parent) {
+        if (this.parent != null) {
+            this.parent.children.add(this);
+        }
+    }
+
     /**
      * 카테고리 문자열로부터 enum 을 반환하는 팩토리 메소드.
      *
      * @param categoryString 카테고리 enum 에 대응되는 문자열(case-insensitive).
      * @return 문자열에 대응하는 카테고리 enum 을 반환한다.
+     * @since 1.0.0
      */
     public static Category of(String categoryString) {
         return Arrays.stream(Category.values())
                 .filter(category -> category.name().equalsIgnoreCase(categoryString))
                 .findAny()
                 .orElseThrow();
+    }
+
+    /**
+     * 카테고리에 속한 모든 하위 카테고리를 가져온다.
+     *
+     * @return 대상 카테고리 아래의 모든 하위 카테코리의 Set 반환
+     * @since 1.0.0
+     */
+    public Set<Category> getAllChildren() {
+        Set<Category> res = new HashSet<>();
+
+        for (final var child : this.children) {
+            getAllChildrenHelper(res, child);
+            res.add(child);
+        }
+
+        return res;
+    }
+
+    private void getAllChildrenHelper(Set<Category> container, Category currentCategory) {
+        for (final var child : currentCategory.children) {
+            getAllChildrenHelper(container, child);
+            container.add(child);
+        }
     }
 
 }

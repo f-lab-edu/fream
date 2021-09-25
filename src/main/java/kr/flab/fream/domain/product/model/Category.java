@@ -3,6 +3,7 @@ package kr.flab.fream.domain.product.model;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.Nonnull;
 
 
 /**
@@ -57,7 +58,7 @@ public enum Category {
      * @return 문자열에 대응하는 카테고리 enum 을 반환한다.
      * @since 1.0.0
      */
-    public static Category of(String categoryString) {
+    public static Category of(@Nonnull String categoryString) {
         return Arrays.stream(Category.values())
                 .filter(category -> category.name().equalsIgnoreCase(categoryString))
                 .findAny()

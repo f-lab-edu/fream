@@ -5,6 +5,7 @@ import kr.flab.domain.product.ProductFixtures
 import kr.flab.domain.product.SizeFixtures
 import kr.flab.fream.DatabaseTest
 import kr.flab.fream.domain.product.SearchOption
+import kr.flab.fream.domain.product.model.Category
 import kr.flab.fream.domain.product.model.Sizes
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
@@ -106,8 +107,21 @@ class ProductMapperSpec extends DatabaseTest {
         products.size() == 10
     }
 
+    def "get Products with Category"() {
+        given:
+        def searchOption = SearchOption.of(null, null, Category.CLOTHING.name())
+        def expect = ProductFixtures.getClothes()
+
+        expect:
+        def actual = productMapper.search(searchOption)
+        assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expect)
+    }
+
     private static SearchOption createSearchOption(String keyword, int page) {
-        return SearchOption.of(keyword, page)
+        return SearchOption.of(keyword, page, null)
     }
 
 }

@@ -224,6 +224,15 @@ public class ProductFixtures {
         );
     }
 
+    public static List<Product> getClothes() {
+        return Arrays.asList(
+                NIKE_STUSSY_BEACH_PANTS_OFF_NOIR,
+                NIKE_STUSSY_WINDRUNNER_JACKET_OFF_NOIR,
+                NIKE_OFF_WHITE_NRG_PANTS_BLACK,
+                SUPREME_CROSS_BOX_LOGO_HOODED_SWEATSHIRT_BLACK
+        );
+    }
+
     public static Product createSneakers(Brand brand, Sizes sizes) {
         final var details = new ProductDetails("ABCD-1234", LocalDate.of(2021, Month.AUGUST, 28),
                 239_000L);

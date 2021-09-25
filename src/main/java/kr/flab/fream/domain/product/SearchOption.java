@@ -26,9 +26,9 @@ public class SearchOption {
     /**
      * 유저로부터 입력받은 키워드, 페이지 번호를 {@code SearchOption} 클래스로 묶어 반환.
      *
-     * @param keywordString 유저가 입력한 검색 키워드. {@code null} 도 입력으로 허용한다.
-     * @param page          검색할 페이지. {@code null} 도 입력으로 허용한다.
-     * @param categoryStr   상품 카테고리. {@code null} 도 입력으로 허용한다.
+     * @param keywordString 유저가 입력한 검색 키워드
+     * @param page          검색할 페이지
+     * @param categoryStr   상품 카테고리
      * @return 입력 값을 검증한 다음, 서비스 레이어에서 사용할 수 있는 {@link SearchOption} 을 리턴
      */
     public static SearchOption of(@Nullable String keywordString, @Nullable Integer page,
@@ -37,7 +37,9 @@ public class SearchOption {
         final var rowBounds = ExtendedRowBounds.of(page);
         Set<Category> categories = new HashSet<>();
         if (categoryStr != null) {
-            categories = Category.of(categoryStr).getAllChildren();
+            final var category = Category.of(categoryStr);
+            categories = category.getAllChildren();
+            categories.add(category);
         }
         return new SearchOption(keyword, rowBounds, categories);
     }

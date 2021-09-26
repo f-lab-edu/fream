@@ -35,9 +35,10 @@ public class ProductController {
     @GetMapping
     public List<ProductDto> search(
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Integer page
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) String category
     ) {
-        final var searchOption = SearchOption.of(keyword, page);
+        final var searchOption = SearchOption.of(keyword, page, category);
 
         List<Product> productList = productService.search(searchOption);
 

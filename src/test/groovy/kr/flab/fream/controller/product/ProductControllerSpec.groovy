@@ -1,10 +1,8 @@
 package kr.flab.fream.controller.product
 
 import kr.flab.domain.product.ProductFixtures
-
 import kr.flab.fream.config.ModelMapperConfiguration
 import kr.flab.fream.domain.product.service.ProductService
-import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -44,7 +42,7 @@ class ProductControllerSpec extends Specification {
                 product.brand.name, product.brand.englishName))
             .collect(Collectors.toList())
 
-        def resultActions = mockMvc.perform(requestBuilder)
+        def resultActions = mockMvc.perform(request)
 
         expect:
         resultActions.andExpect(status().is(HttpStatus.OK.value()))
@@ -54,14 +52,18 @@ class ProductControllerSpec extends Specification {
             .getResponse()
             .getContentAsString(StandardCharsets.UTF_8)
         def resultObject = Arrays.asList(objectMapper.readValue(resBody, ProductDto[].class))
-        def config = new RecursiveComparisonConfiguration()
-        config.ignoreCollectionOrder(true)
-        assertThat(resultObject).usingRecursiveComparison(config).isEqualTo(expect)
+        assertThat(resultObject).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(expect)
 
         where:
-        requestBuilder << [
+        request << [
             get("/products"),
-            get("/products").param("page", "1").param("keyword", "nike")
+            get("/products")
+                .param("page", "1")
+                .param("keyword", "nike"),
+            get("/products")
+                .param("page", "1")
+                .param("keyword", "nike")
+                .param("category", "CLOTHING"),
         ]
     }
 
@@ -76,9 +78,10 @@ class ProductControllerSpec extends Specification {
             .andExpect(jsonPath('$.error').value(errorMessage))
 
         where:
-        testcase              || request                                 || errorMessage
-        "Invalid page number" || get("/products").param("page", "0")     || "페이지 번호는 0보다 커야 합니다."
-        "Invalid Keyword"     || get("/products").param("keyword", "a")  || "검색 키워드는 두 글자 이상이어야 합니다."
+        testcase              || request                                                || errorMessage
+        "Invalid page number" || get("/products").param("page", "0")                    || "페이지 번호는 0보다 커야 합니다."
+        "Invalid Keyword"     || get("/products").param("keyword", "a")                 || "검색 키워드는 두 글자 이상이어야 합니다."
+        "Invalid Category"    || get("/products").param("category", "INVALID_CATEGORY") || "존재하지 않는 카테고리 입니다."
     }
 
 }

@@ -1,8 +1,8 @@
 # 👟 Fream
 
-![coverage](.github/badges/jacoco.svg)
-![branches coverage](.github/badges/branches.svg)
-[![CI](https://github.com/f-lab-edu/fream/actions/workflows/ci.yml/badge.svg)](https://github.com/f-lab-edu/fream/actions/workflows/ci.yml)
+![coverage](badges/jacoco.svg)
+![branches coverage](badges/branches.svg)
+![CI](https://github.com/f-lab-edu/fream/actions/workflows/ci.yml/badge.svg)
 
 한정판 거래 플랫폼 **Kream** 을 클론코딩한 프로젝트입니다.
 

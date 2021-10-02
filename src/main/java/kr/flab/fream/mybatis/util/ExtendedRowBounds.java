@@ -24,7 +24,7 @@ public class ExtendedRowBounds extends RowBounds {
      * 페이지 번호를 입력하지 않았다면 첫 페이지 조회를 요청했다고 간주한다.
      *
      * @param page 페이지 번호. 값은 {@code 1} 이상이거나, {@code null} 이어야 한다.
-     * @return  페이지 번호에 해당하는 {@link RowBounds} 생성
+     * @return 페이지 번호에 해당하는 {@link RowBounds} 생성
      */
     public static ExtendedRowBounds of(@Nullable Integer page) {
         if (page == null) {
@@ -40,6 +40,15 @@ public class ExtendedRowBounds extends RowBounds {
 
     private static ExtendedRowBounds of(int offset, int limit) {
         return new ExtendedRowBounds(offset, limit);
+    }
+
+    /**
+     * {@code ExtendedRowBounds(1)} 코드를 작성한 것과 같다.
+     *
+     * @return 첫 번째 페이지를 나타내는 RowBounds 반환
+     */
+    public static ExtendedRowBounds firstPage() {
+        return of(1);
     }
 
     private static ExtendedRowBounds createDefault() {

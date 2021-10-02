@@ -89,16 +89,35 @@
             <if test="keyword.value != null">
                 MATCH(name, english_name) AGAINST('\"${keyword.value}\"' IN BOOLEAN MODE)
             </if>
-            <if test="categories.size() > 0">
+            <if test="!categories.isEmpty()">
                 AND category IN
                 <foreach collection="categories" item="item" separator="," open="(" close=")">
                     #{item}
                 </foreach>
             </if>
+            <if test="!sizeIdList.isEmpty()">
+                AND id IN (
+                SELECT C.product_id
+                FROM (
+                SELECT COUNT(*) cnt, product_id
+                FROM product_size
+                WHERE size_id IN
+                <foreach collection="sizeIdList" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+                GROUP BY product_id
+                ) AS C
+                WHERE C.cnt = ${sizeIdList.size()}
+                )
+            </if>
+            <if test="!brandIdList.isEmpty()">
+                AND brand_id IN
+                <foreach collection="brandIdList" item="item" separator="," open="(" close=")">
+                    ${item}
+                </foreach>
+            </if>
         </where>
-        <if test="rowBounds != null">
-            LIMIT ${rowBounds.limit} OFFSET ${rowBounds.offset}
-        </if>
+        LIMIT ${rowBounds.limit} OFFSET ${rowBounds.offset}
         ) AS p
         JOIN brand AS b ON p.brand_id = b.id
         JOIN product_size ps ON p.id = ps.product_id

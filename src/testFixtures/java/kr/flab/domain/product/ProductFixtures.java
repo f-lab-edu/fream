@@ -41,6 +41,7 @@ public class ProductFixtures {
 
     private static final Product SUPREME_WASHED_CHINO_TWILL_CAMP_CAP_BLACK;
     private static final Product SUPREME_CROSS_BOX_LOGO_HOODED_SWEATSHIRT_BLACK;
+    private static final Product SUPREME_MESH_POCKET_BELTED_CARGO_PANTS_BLACK;
 
     private static final Product SONY_PLAYSTATION_5;
 
@@ -131,7 +132,14 @@ public class ProductFixtures {
                 new ProductDetails(null, LocalDate.of(2020, 12, 3), 195_900L),
                 getSUPREME(), getClothingSizes());
 
-        SONY_PLAYSTATION_5 = new Product(202L,
+        SUPREME_MESH_POCKET_BELTED_CARGO_PANTS_BLACK = new Product(203L,
+                "슈프림 메쉬 포켓 벨티드 카고 팬츠 블랙 (21SS)",
+                "Supreme Mesh Pocket Belted Cargo Pants Black (21SS)",
+                Category.BOTTOM,
+                new ProductDetails(null, LocalDate.of(2021, 6, 10), 234_900L),
+                getSUPREME(), getClothingSizes());
+
+        SONY_PLAYSTATION_5 = new Product(251L,
                 "소니 플레이스테이션 5 디지털 에디션 (한국 정식 발매 제품)",
                 "Sony Playstation 5 Digital Edition (SIEK 220V)",
                 Category.TECH,
@@ -205,6 +213,10 @@ public class ProductFixtures {
         return SUPREME_CROSS_BOX_LOGO_HOODED_SWEATSHIRT_BLACK;
     }
 
+    public static Product getSupremeMeshPocketBeltedCargoPantsBlack() {
+        return SUPREME_MESH_POCKET_BELTED_CARGO_PANTS_BLACK;
+    }
+
     public static Product getSonyPlaystation5() {
         return SONY_PLAYSTATION_5;
     }
@@ -221,6 +233,14 @@ public class ProductFixtures {
                 NIKE_STUSSY_WINDRUNNER_JACKET_OFF_NOIR,
                 NIKE_STUSSY_BEACH_PANTS_OFF_NOIR,
                 NIKE_OFF_WHITE_NRG_PANTS_BLACK
+        );
+    }
+
+    public static List<Product> getAdidasProducts() {
+        return Arrays.asList(
+                ADIDAS_YEEZY_BOOST_350_V2_BLACK_RED_2020,
+                ADIDAS_YEEZY_SLIDE_PURE,
+                ADIDAS_SUPERSTAR_PREMIUM_WHITE_BLACK
         );
     }
 

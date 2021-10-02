@@ -327,6 +327,23 @@ VALUES (202, 20),
        (202, 27)
 ;
 
+INSERT INTO product(id, name, english_name, product_code, release_date, retail_price, brand_id,
+                    category)
+VALUES (203, '슈프림 메쉬 포켓 벨티드 카고 팬츠 블랙 (21SS)',
+        'Supreme Mesh Pocket Belted Cargo Pants Black (21SS)', null, '2021-06-10', 234900, 6,
+        'BOTTOM');
+
+INSERT INTO product_size(product_id, size_id)
+VALUES (203, 20),
+       (203, 21),
+       (203, 22),
+       (203, 23),
+       (203, 24),
+       (203, 25),
+       (203, 26),
+       (203, 27)
+;
+
 
 # Sony
 INSERT INTO product(id, name, english_name, product_code, release_date, retail_price, brand_id,

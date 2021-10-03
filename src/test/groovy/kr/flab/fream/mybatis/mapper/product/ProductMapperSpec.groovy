@@ -80,7 +80,6 @@ class ProductMapperSpec extends DatabaseTest {
         where:
         keyword     || expectElementSize
         '나이키'       || 6
-        'nike'      || 6
         '오프화이트'     || 2
         'off-white' || 2
         '992'       || 1

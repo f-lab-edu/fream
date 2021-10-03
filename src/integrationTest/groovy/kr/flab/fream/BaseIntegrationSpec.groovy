@@ -6,8 +6,8 @@ import io.restassured.specification.RequestSpecification
 import org.junit.Rule
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.restdocs.JUnitRestDocumentation
-import spock.lang.Specification
 
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration
 
 @CompileStatic
@@ -21,7 +21,9 @@ class BaseIntegrationSpec extends DatabaseTest {
 
     def setup() {
         this.spec = new RequestSpecBuilder()
-            .addFilter(documentationConfiguration(this.restDocumentation))
+            .addFilter(documentationConfiguration(this.restDocumentation)
+                .operationPreprocessors()
+                .withResponseDefaults(prettyPrint()))
             .build()
     }
 

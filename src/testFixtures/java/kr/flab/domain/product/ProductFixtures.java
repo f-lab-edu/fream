@@ -225,6 +225,28 @@ public class ProductFixtures {
         return LEGO_DC_COMICS_BATMAN_THE_TUMBLER;
     }
 
+    public static List<Product> allProducts() {
+        return Arrays.asList(
+                NIKE_DUNK_LOW_RETRO_BLACK,
+                NIKE_OFF_WHITE_DUNK_LOT_18,
+                NIKE_PEACEMINUSONE_AIR_FORCE_1_LOW_PARA_NOISE_2,
+                NIKE_STUSSY_WINDRUNNER_JACKET_OFF_NOIR,
+                NIKE_STUSSY_BEACH_PANTS_OFF_NOIR,
+                NIKE_OFF_WHITE_NRG_PANTS_BLACK,
+                ADIDAS_YEEZY_BOOST_350_V2_BLACK_RED_2020,
+                ADIDAS_YEEZY_SLIDE_PURE,
+                ADIDAS_SUPERSTAR_PREMIUM_WHITE_BLACK,
+                NEW_BALANCE_992,
+                JORDAN_1_TRAVIS_SCOTT_RETRO_HIGH_OG_SP_MOCHA,
+                JORDAN_1_TRAVIS_SCOTT_FRAGMENT_RETRO_HIGH_OG_SP_MILITARY_BLUE,
+                SUPREME_WASHED_CHINO_TWILL_CAMP_CAP_BLACK,
+                SUPREME_CROSS_BOX_LOGO_HOODED_SWEATSHIRT_BLACK,
+                SUPREME_MESH_POCKET_BELTED_CARGO_PANTS_BLACK,
+                SONY_PLAYSTATION_5,
+                LEGO_DC_COMICS_BATMAN_THE_TUMBLER
+        );
+    }
+
     public static List<Product> getNikeProducts() {
         return Arrays.asList(
                 NIKE_DUNK_LOW_RETRO_BLACK,

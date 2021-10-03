@@ -1,12 +1,13 @@
 plugins {
 	id 'org.springframework.boot' version '2.5.3'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'org.asciidoctor.convert' version '1.5.8'
+	id 'org.asciidoctor.jvm.convert' version '3.3.2'
 	id 'groovy'
 	id 'java'
 	id 'checkstyle'
 	id 'jacoco'
 	id 'java-test-fixtures'
+	id 'com.dorongold.task-tree' version '2.1.0'
 }
 
 group = 'kr.flab'
@@ -114,9 +115,6 @@ tasks.named('check') {
 }
 
 dependencies {
-	integrationTestImplementation(project)
-
-	asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -133,13 +131,11 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:2.2.0'
-	testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
 	testImplementation 'org.testcontainers:mysql'
 	testImplementation 'org.testcontainers:spock:1.15.3'
 	testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
 	testImplementation 'org.spockframework:spock-spring:2.0-groovy-3.0'
 	testImplementation 'org.spockframework:spock-junit4:2.0-groovy-3.0'
-	testImplementation 'io.rest-assured:rest-assured:4.4.0'
 	testImplementation 'org.assertj:assertj-core:3.19.0'
 
 	integrationTestImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -28,17 +28,23 @@ public class ProductController {
     /**
      * 상품 목록을 조회한다. 유저는 상품 검색에 옵션을 사용해 원하는 정보만 가져올 수 있다.
      *
-     * @param keyword 유저가 입력한 상품 키워드.
-     * @param page    조죄할 페이지.
+     * @param keyword     유저가 입력한 상품 키워드
+     * @param page        조죄할 페이지
+     * @param category    카테고리를 나타내는 문자열
+     * @param brandIdList 브랜드 ID 목록
+     * @param sizeIdList  사이즈 ID 목록
      * @return 상품 목록 리턴
      */
     @GetMapping
     public List<ProductDto> search(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) String category
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) List<Long> brandIdList,
+            @RequestParam(required = false) List<Long> sizeIdList
     ) {
-        final var searchOption = SearchOption.of(keyword, page, category);
+        final var searchOption =
+                SearchOption.of(keyword, page, category, brandIdList, sizeIdList);
 
         List<Product> productList = productService.search(searchOption);
 

@@ -23,6 +23,12 @@ jobs:
       - name: check the project
         run: ./gradlew clean check -i
 
+      - name: change to the source branch
+        run: |
+          git checkout "$TARGET_BRANCH"
+        env:
+          TARGET_BRANCH: ${{ github.head_ref }}
+
       - name: Generate JaCoCo Badge
         uses: cicirello/jacoco-badge-generator@v2
         with:
@@ -46,4 +52,4 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.AUTHORIZED_GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+          branch: ${{ github.head_ref }}

@@ -16,9 +16,12 @@ public class SizeFixtures {
     private static final Sizes ONE_SIZE;
 
     static {
-        List<Integer> sizeList = IntStream.iterate(210, size -> size <= 320, size -> size + 5)
+        List<Integer> sizeList = IntStream.iterate(220, size -> size <= 300, size -> size + 5)
                 .boxed()
                 .collect(Collectors.toList());
+
+        sizeList.add(310);
+        sizeList.add(320);
 
         SNEAKERS_SIZES = IntStream.range(0, sizeList.size())
                 .mapToObj(i -> new Size(i + 1L, String.valueOf(sizeList.get(i))))

@@ -5,11 +5,15 @@ import kr.flab.domain.product.ProductFixtures
 import kr.flab.domain.product.SizeFixtures
 import kr.flab.fream.DatabaseTest
 import kr.flab.fream.domain.product.SearchOption
+import kr.flab.fream.domain.product.model.Category
 import kr.flab.fream.domain.product.model.Sizes
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
+
+import java.util.stream.Collectors
+import java.util.stream.Stream
 
 import static org.assertj.core.api.Assertions.assertThat
 
@@ -65,39 +69,27 @@ class ProductMapperSpec extends DatabaseTest {
 
     // 아래 테스트 케이스들은 seed data 를 사용함. resources/db/migration-seed 데이터 확인
 
-    def "search Nike products"() {
+    def "search products by the keyword"() {
         given:
-        def actual = productMapper.search(createSearchOption(str, 1))
+        def searchOption = SearchOption.builder().keyword(keyword).build()
+        def actual = productMapper.search(searchOption)
 
         expect:
-        actual.size() == 6
+        actual.size() == expectElementSize
 
         where:
-        str << ['나이키', 'nike']
-    }
-
-    def "search Off-White products"() {
-        given:
-        def actual = productMapper.search(createSearchOption(str, 1))
-
-        expect:
-        actual.size() == 2
-
-        where:
-        str << ['오프화이트', 'off-white']
-    }
-
-    def "search NB 992 product"() {
-        given:
-        def actual = productMapper.search(createSearchOption("992", 1))
-
-        expect:
-        actual.size() == 1
+        keyword     || expectElementSize
+        '나이키'       || 6
+        '오프화이트'     || 2
+        'off-white' || 2
+        '992'       || 1
     }
 
     def "get Products with Pagination"() {
         given:
-        def searchOption = createSearchOption(null, 1)
+        def searchOption = SearchOption.builder()
+            .page(1)
+            .build()
 
         when:
         def products = productMapper.search(searchOption)
@@ -106,8 +98,95 @@ class ProductMapperSpec extends DatabaseTest {
         products.size() == 10
     }
 
-    private static SearchOption createSearchOption(String keyword, int page) {
-        return SearchOption.of(keyword, page)
+    def "get Products with Category"() {
+        given:
+        def searchOption = SearchOption.builder()
+            .categoriesOf(Category.CLOTHING.name())
+            .build()
+        def expect = ProductFixtures.getClothes()
+
+        expect:
+        def actual = productMapper.search(searchOption)
+        assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expect)
+    }
+
+    def "get Products By brands"() {
+        given:
+        def brandIds = Arrays.asList(BrandFixtures.getNike(), BrandFixtures.getADIDAS())
+            .stream()
+            .map(brand -> brand.getId())
+            .collect(Collectors.toList())
+
+        def searchOption = SearchOption.builder()
+            .brandIdList(brandIds)
+            .build()
+        def expect =
+            Stream.concat(ProductFixtures.getNikeProducts().stream(),
+                ProductFixtures.getAdidasProducts().stream()).collect(Collectors.toList())
+
+        expect:
+        def actual = productMapper.search(searchOption)
+        assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expect)
+    }
+
+    def "get Products that have sizes of Clothing"() {
+        given:
+        def sizeIds = SizeFixtures.getClothingSizes()
+            .sizeList
+            .stream()
+            .map(size -> size.getId())
+            .collect(Collectors.toList())
+
+        def searchOption = SearchOption.builder()
+            .sizeIdList(sizeIds)
+            .build()
+        def expect = ProductFixtures.getClothes()
+
+        expect:
+        def actual = productMapper.search(searchOption)
+        assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expect)
+    }
+
+    def "get Products by the complex search option"() {
+        given:
+        def sizeIds = SizeFixtures.getClothingSizes()
+            .sizeList
+            .stream()
+            .map(size -> size.getId())
+            .collect(Collectors.toList())
+
+        def brandIds = Arrays.asList(BrandFixtures.getNike().getId(),
+            BrandFixtures.getSUPREME().getId())
+
+        def keyword = "팬츠"
+
+        def searchOption = SearchOption.builder()
+            .keyword(keyword)
+            .categoriesOf(Category.CLOTHING.name())
+            .sizeIdList(sizeIds)
+            .brandIdList(brandIds)
+            .build()
+        def expect = Arrays.asList(
+            ProductFixtures.getNikeStussyBeachPantsOffNoir(),
+            ProductFixtures.getNikeOffWhiteNrgPantsBlack(),
+            ProductFixtures.getSupremeMeshPocketBeltedCargoPantsBlack()
+        )
+
+        expect:
+        def actual = productMapper.search(searchOption)
+        assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expect)
     }
 
 }

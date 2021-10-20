@@ -1,7 +1,9 @@
 package kr.flab.fream.controller.product
 
 import kr.flab.domain.product.ProductFixtures
+import kr.flab.fream.config.FormattingConfiguration
 import kr.flab.fream.config.ModelMapperConfiguration
+import kr.flab.fream.domain.product.SearchOption
 import kr.flab.fream.domain.product.service.ProductService
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(ProductController)
-@Import([ObjectMapper, ModelMapperConfiguration])
+@Import([ObjectMapper, ModelMapperConfiguration, FormattingConfiguration])
 class ProductControllerSpec extends Specification {
 
     @Autowired
@@ -32,7 +34,7 @@ class ProductControllerSpec extends Specification {
 
     @SpringBean
     ProductService productService = Stub {
-        search(_) >> ProductFixtures.getNikeProducts()
+        search(_ as SearchOption) >> ProductFixtures.getNikeProducts()
     }
 
     def "get Products"() {

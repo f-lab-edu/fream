@@ -27,5 +27,6 @@ public class Product {
     private ProductDetails details;
     private Brand brand;
     private Sizes sizes;
+    private Long viewCount;
 
 }

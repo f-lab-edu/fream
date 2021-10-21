@@ -9,6 +9,7 @@
         <id column="id" property="id"/>
         <result column="name" property="name"/>
         <result column="english_name" property="englishName"/>
+        <result column="view_count" property="viewCount"/>
         <result column="category" javaType="kr.flab.fream.domain.product.model.Category"
             jdbcType="VARCHAR"
             property="category"
@@ -49,6 +50,7 @@
                p.product_code AS product_code,
                p.release_date AS release_date,
                p.retail_price AS retail_price,
+               p.view_count   AS view_count,
                b.id           AS brand_id,
                b.name         AS brand_name,
                b.english_name AS brand_english_name,
@@ -77,6 +79,7 @@
         p.product_code AS product_code,
         p.release_date AS release_date,
         p.retail_price AS retail_price,
+        p.view_count AS view_count,
         b.id AS brand_id,
         b.name AS brand_name,
         b.english_name AS brand_english_name,
@@ -117,6 +120,12 @@
                 </foreach>
             </if>
         </where>
+        <if test='orderOption.name.equals("POPULAR")'>
+            ORDER BY view_count DESC
+        </if>
+        <if test='orderOption.name.equals("RECENTLY_RELEASED")'>
+            ORDER BY release_date DESC
+        </if>
         LIMIT ${rowBounds.limit} OFFSET ${rowBounds.offset}
         ) AS p
         JOIN brand AS b ON p.brand_id = b.id

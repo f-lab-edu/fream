@@ -4,6 +4,7 @@ import kr.flab.domain.product.BrandFixtures
 import kr.flab.domain.product.ProductFixtures
 import kr.flab.domain.product.SizeFixtures
 import kr.flab.fream.DatabaseTest
+import kr.flab.fream.domain.product.OrderOption
 import kr.flab.fream.domain.product.SearchOption
 import kr.flab.fream.domain.product.model.Category
 import kr.flab.fream.domain.product.model.Sizes
@@ -180,6 +181,58 @@ class ProductMapperSpec extends DatabaseTest {
             ProductFixtures.getNikeOffWhiteNrgPantsBlack(),
             ProductFixtures.getSupremeMeshPocketBeltedCargoPantsBlack()
         )
+
+        expect:
+        def actual = productMapper.search(searchOption)
+        assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expect)
+    }
+
+    def "sort by View Counts"() {
+        given:
+        def searchOption = SearchOption.builder()
+            .orderOption(OrderOption.POPULAR)
+            .build()
+        def expect = ProductFixtures.allProducts()
+            .stream()
+            .sorted((a, b) -> -1 * (a.viewCount <=> b.viewCount))
+            .limit(10)
+            .collect(Collectors.toList())
+
+        expect:
+        def actual = productMapper.search(searchOption)
+        assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expect)
+    }
+
+    def "sort by release date"() {
+        given:
+        def searchOption = SearchOption.builder()
+            .orderOption(OrderOption.RECENTLY_RELEASED)
+            .build()
+        def expect = ProductFixtures.allProducts()
+            .stream()
+            .sorted((a, b) -> {
+                def releaseDate1 = a.details.releaseDate
+                def releaseDate2 = b.details.releaseDate
+
+                if (Objects.equals(releaseDate1, releaseDate2)) {
+                    return 0
+                }
+                if (releaseDate1 == null) {
+                    return 1
+                }
+                if (releaseDate2 == null) {
+                    return -1
+                }
+                return -1 * (releaseDate1 <=> releaseDate2)
+            })
+            .limit(10)
+            .collect(Collectors.toList())
 
         expect:
         def actual = productMapper.search(searchOption)

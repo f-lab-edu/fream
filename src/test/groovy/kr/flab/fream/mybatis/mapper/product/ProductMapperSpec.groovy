@@ -1,7 +1,6 @@
 package kr.flab.fream.mybatis.mapper.product
 
 import kr.flab.domain.product.BrandFixtures
-import kr.flab.domain.product.ProductFixtures
 import kr.flab.domain.product.SizeFixtures
 import kr.flab.fream.DatabaseTest
 import kr.flab.fream.domain.product.OrderOption
@@ -16,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
+import static kr.flab.domain.product.ProductFixtures.*
 import static org.assertj.core.api.Assertions.assertThat
 
 @MybatisTest
@@ -36,7 +36,7 @@ class ProductMapperSpec extends DatabaseTest {
         def size = SizeFixtures.createUs8Size()
         def brand = BrandFixtures.createBrand()
         def sizes = new Sizes(Arrays.asList(size))
-        def sneakers = ProductFixtures.createSneakers(brand, sizes)
+        def sneakers = createSneakers(brand, sizes)
 
         sizeMapper.addSize(size)
         brandMapper.addBrand(brand)
@@ -51,7 +51,7 @@ class ProductMapperSpec extends DatabaseTest {
         def size2 = SizeFixtures.createUs85Size()
         def brand = BrandFixtures.createBrand()
         def sizes = new Sizes(Arrays.asList(size, size2))
-        def sneakers = ProductFixtures.createSneakers(brand, sizes)
+        def sneakers = createSneakers(brand, sizes)
 
         sizeMapper.addSize(size)
         sizeMapper.addSize(size2)
@@ -104,7 +104,7 @@ class ProductMapperSpec extends DatabaseTest {
         def searchOption = SearchOption.builder()
             .categoriesOf(Category.CLOTHING.name())
             .build()
-        def expect = ProductFixtures.getClothes()
+        def expect = getClothes()
 
         expect:
         def actual = productMapper.search(searchOption)
@@ -125,8 +125,8 @@ class ProductMapperSpec extends DatabaseTest {
             .brandIdList(brandIds)
             .build()
         def expect =
-            Stream.concat(ProductFixtures.getNikeProducts().stream(),
-                ProductFixtures.getAdidasProducts().stream()).collect(Collectors.toList())
+            Stream.concat(getNikeProducts().stream(),
+                getAdidasProducts().stream()).collect(Collectors.toList())
 
         expect:
         def actual = productMapper.search(searchOption)
@@ -147,7 +147,7 @@ class ProductMapperSpec extends DatabaseTest {
         def searchOption = SearchOption.builder()
             .sizeIdList(sizeIds)
             .build()
-        def expect = ProductFixtures.getClothes()
+        def expect = getClothes()
 
         expect:
         def actual = productMapper.search(searchOption)
@@ -177,9 +177,9 @@ class ProductMapperSpec extends DatabaseTest {
             .brandIdList(brandIds)
             .build()
         def expect = Arrays.asList(
-            ProductFixtures.getNikeStussyBeachPantsOffNoir(),
-            ProductFixtures.getNikeOffWhiteNrgPantsBlack(),
-            ProductFixtures.getSupremeMeshPocketBeltedCargoPantsBlack()
+            getNikeStussyBeachPantsOffNoir(),
+            getNikeOffWhiteNrgPantsBlack(),
+            getSupremeMeshPocketBeltedCargoPantsBlack()
         )
 
         expect:
@@ -195,9 +195,7 @@ class ProductMapperSpec extends DatabaseTest {
         def searchOption = SearchOption.builder()
             .orderOption(OrderOption.POPULAR)
             .build()
-        def expect = ProductFixtures.allProducts()
-            .stream()
-            .sorted((a, b) -> -1 * (a.viewCount <=> b.viewCount))
+        def expect = sortByViewCount(allProducts().stream())
             .limit(10)
             .collect(Collectors.toList())
 
@@ -214,23 +212,7 @@ class ProductMapperSpec extends DatabaseTest {
         def searchOption = SearchOption.builder()
             .orderOption(OrderOption.RECENTLY_RELEASED)
             .build()
-        def expect = ProductFixtures.allProducts()
-            .stream()
-            .sorted((a, b) -> {
-                def releaseDate1 = a.details.releaseDate
-                def releaseDate2 = b.details.releaseDate
-
-                if (Objects.equals(releaseDate1, releaseDate2)) {
-                    return 0
-                }
-                if (releaseDate1 == null) {
-                    return 1
-                }
-                if (releaseDate2 == null) {
-                    return -1
-                }
-                return -1 * (releaseDate1 <=> releaseDate2)
-            })
+        def expect = sortByReleaseDate(allProducts().stream())
             .limit(10)
             .collect(Collectors.toList())
 

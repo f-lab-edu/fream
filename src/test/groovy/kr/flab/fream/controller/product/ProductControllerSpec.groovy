@@ -1,8 +1,8 @@
 package kr.flab.fream.controller.product
 
-import kr.flab.domain.product.ProductFixtures
 import kr.flab.fream.config.FormattingConfiguration
 import kr.flab.fream.config.ModelMapperConfiguration
+import kr.flab.fream.domain.product.OrderOption
 import kr.flab.fream.domain.product.SearchOption
 import kr.flab.fream.domain.product.service.ProductService
 import org.spockframework.spring.SpringBean
@@ -17,6 +17,7 @@ import spock.lang.Specification
 import java.nio.charset.StandardCharsets
 import java.util.stream.Collectors
 
+import static kr.flab.domain.product.ProductFixtures.nikeProducts
 import static org.assertj.core.api.Assertions.assertThat
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -33,12 +34,12 @@ class ProductControllerSpec extends Specification {
     ObjectMapper objectMapper
 
     @SpringBean
-    ProductService productService = Stub {
-        search(_ as SearchOption) >> ProductFixtures.getNikeProducts()
+    ProductService productService = Mock {
+        search(_ as SearchOption) >> getNikeProducts()
     }
 
     def "get Products"() {
-        def expect = ProductFixtures.getNikeProducts().stream()
+        def expect = getNikeProducts().stream()
             .map(product -> new ProductDto(product.id, product.name,
                 product.englishName, product.category.name(),
                 product.brand.name, product.brand.englishName))
@@ -67,6 +68,25 @@ class ProductControllerSpec extends Specification {
                 .param("keyword", "nike")
                 .param("category", "CLOTHING"),
         ]
+    }
+
+    def "return 200 and sort by popularity(view count) even using wrong sort option input"() {
+        given:
+        def request = get("/products")
+            .param("orderOption", "INVALID_ORDER_OPTION")
+
+        when:
+        def resultActions = mockMvc.perform(request)
+
+        then:
+        resultActions.andExpect(status().is(HttpStatus.OK.value()))
+
+        and:
+        1 * productService.search(_) >> {
+            def searchOption = (it as List<?>)[0] as SearchOption
+            assert searchOption.orderOption == OrderOption.POPULAR
+            return getNikeProducts()
+        }
     }
 
     def "return 400 If parameters are invalid when requesting Product List - '#testcase'"() {

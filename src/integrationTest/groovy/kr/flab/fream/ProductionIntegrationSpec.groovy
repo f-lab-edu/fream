@@ -10,7 +10,6 @@ import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.http.HttpStatus
 
 import java.util.function.Predicate
-import java.util.stream.Stream
 
 import static io.restassured.RestAssured.given
 import static java.util.stream.Collectors.toList
@@ -234,28 +233,6 @@ class ProductionIntegrationSpec extends BaseIntegrationSpec {
         "products/search/invalidPaging"   || Map.of("page", "0")
         "products/search/invalidKeyword"  || Map.of("keyword", "")
         "products/search/invalidCategory" || Map.of("category", "NONE")
-    }
-
-    private static Stream sortByViewCount(Stream<Product> s) {
-        return s.sorted((a, b) -> -1 * (a.viewCount <=> b.viewCount))
-    }
-
-    private static Stream sortByReleaseDate(Stream<Product> s) {
-        return s.sorted((a, b) -> {
-            def releaseDate1 = a.details.releaseDate
-            def releaseDate2 = b.details.releaseDate
-
-            if (Objects.equals(releaseDate1, releaseDate2)) {
-                return 0
-            }
-            if (releaseDate1 == null) {
-                return 1
-            }
-            if (releaseDate2 == null) {
-                return -1
-            }
-            return -1 * (releaseDate1 <=> releaseDate2)
-        })
     }
 
 }

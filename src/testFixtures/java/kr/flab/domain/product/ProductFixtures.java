@@ -15,6 +15,8 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 import kr.flab.fream.domain.product.model.Brand;
 import kr.flab.fream.domain.product.model.Category;
 import kr.flab.fream.domain.product.model.Product;
@@ -282,5 +284,28 @@ public class ProductFixtures {
                 239_000L);
         return new Product(null, "신발", "sneakers", Category.SNEAKERS, details, brand, sizes, 0L);
     }
+
+    public static Stream<Product> sortByViewCount(Stream<Product> s) {
+        return s.sorted((a, b) -> -1 * (a.getViewCount().compareTo(b.getViewCount())));
+    }
+
+    public static Stream<Product> sortByReleaseDate(Stream<Product> s) {
+        return s.sorted((a, b) -> {
+            LocalDate releaseDate1 = a.getDetails().getReleaseDate();
+            LocalDate releaseDate2 = b.getDetails().getReleaseDate();
+
+            if (Objects.equals(releaseDate1, releaseDate2)) {
+                return 0;
+            }
+            if (releaseDate1 == null) {
+                return 1;
+            }
+            if (releaseDate2 == null) {
+                return -1;
+            }
+            return -1 * (releaseDate1.compareTo(releaseDate2));
+        });
+    }
+
 
 }

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.flab.fream.mybatis.mapper.auction.BidMapper">
+    <resultMap id="bidResultMap" type="kr.flab.fream.domain.auction.model.Bid">
+        <id column="id" property="id"/>
+        <result column="due_date" property="dueDate"/>
+        <result column="price" property="price"/>
+        <result column="created_at" property="createdAt"/>
+        <association javaType="kr.flab.fream.domain.product.model.Product" property="product">
+            <result column="product_id" property="id"/>
+        </association>
+        <association javaType="kr.flab.fream.domain.product.model.Size" property="size">
+            <id column="size_id" property="id"/>
+        </association>
+    </resultMap>
+
+    <delete id="cancel"
+        parameterType="kr.flab.fream.domain.auction.model.Bid">
+        DELETE
+        FROM bid
+        WHERE id = #{id}
+    </delete>
+
+    <insert id="create"
+        keyProperty="id"
+        parameterType="kr.flab.fream.domain.auction.model.Bid"
+        useGeneratedKeys="true">
+        INSERT INTO bid (price, product_id, size_id, created_at, due_date)
+        VALUES (#{price}, #{product.id}, #{size.id}, #{createdAt}, #{dueDate})
+    </insert>
+
+    <update id="update" parameterType="kr.flab.fream.domain.auction.model.Bid">
+        UPDATE bid
+        SET price      = #{price},
+            due_date   = #{dueDate},
+            product_id = #{product.id},
+            size_id    = #{size.id}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

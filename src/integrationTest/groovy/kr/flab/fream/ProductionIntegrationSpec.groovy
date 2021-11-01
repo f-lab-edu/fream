@@ -3,6 +3,7 @@ package kr.flab.fream
 import io.restassured.http.ContentType
 import kr.flab.domain.product.BrandFixtures
 import kr.flab.domain.product.SizeFixtures
+import kr.flab.fream.domain.product.OrderOption
 import kr.flab.fream.domain.product.model.Category
 import kr.flab.fream.domain.product.model.Product
 import org.springframework.boot.web.server.LocalServerPort
@@ -41,6 +42,10 @@ class ProductionIntegrationSpec extends BaseIntegrationSpec {
         parameterWithName("sizeIdList")
             .description("사이즈 ID 리스트")
             .optional(),
+        parameterWithName("orderOption")
+            .description("정렬 옵션 - 인기순과 발매일순 두 가지 옵션 제공하며, 생략 시 인기순" +
+                "적용")
+            .optional()
     )
 
     def "get products"() {
@@ -59,14 +64,26 @@ class ProductionIntegrationSpec extends BaseIntegrationSpec {
         assertThat(actual)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
-            .isEqualTo(expect)
+            .isEqualTo(expect.collect(toList()))
 
         where:
-        identifier                 || params                       || expect
-        "products/search"          || Collections.emptyMap()       || allProducts().stream().limit(10).map(p -> p.name).collect(toList())
-        "products/search/paging"   || Map.of("page", "2")          || allProducts().stream().skip(10).limit(10).map(p -> p.name).collect(toList())
-        "products/search/keyword"  || Map.of("keyword", "나이키")     || getNikeProducts().stream().map(p -> p.name).collect(toList())
-        "products/search/category" || Map.of("category", "BOTTOM") || allProducts().stream().filter(p -> p.category == Category.BOTTOM).map(p -> p.name).collect(toList())
+        identifier << [
+            "products/search", "products/search/paging",
+            "products/search/keyword", "products/search/category"
+        ]
+        params << [
+            Collections.emptyMap(),
+            Map.of("page", "2"),
+            Map.of("keyword", "나이키"),
+            Map.of("category", "BOTTOM"),
+        ]
+        expect << [
+            sortByViewCount(allProducts().stream()).limit(10).map(p -> p.name),
+            sortByViewCount(allProducts().stream()).skip(10).limit(10).map(p -> p.name),
+            sortByViewCount(getNikeProducts().stream()).map(p -> p.name),
+            sortByViewCount(allProducts().stream()).filter(p -> p.category == Category.BOTTOM)
+                .map(p -> p.name),
+        ]
     }
 
     def "get products have brands"() {
@@ -86,7 +103,7 @@ class ProductionIntegrationSpec extends BaseIntegrationSpec {
         def response = request.when().port(this.port).get(PRODUCTS_URL)
 
         then:
-        def expect = allProducts().stream()
+        def expect = sortByViewCount(allProducts().stream())
             .filter(p -> nikeAndSupreme.contains(p.getBrand().id))
             .map(p -> p.name)
             .collect(toList())
@@ -118,7 +135,7 @@ class ProductionIntegrationSpec extends BaseIntegrationSpec {
         Predicate<Product> hasSomeClothingSizes = p -> p.sizes.sizeList.stream().map(s -> s.id)
             .collect(toList())
             .containsAll(smallClothingSizes)
-        def expect = allProducts().stream()
+        def expect = sortByViewCount(allProducts().stream())
             .filter(hasSomeClothingSizes)
             .map(p -> p.name)
             .collect(toList())
@@ -155,9 +172,9 @@ class ProductionIntegrationSpec extends BaseIntegrationSpec {
         def response = request.when().port(this.port).get(PRODUCTS_URL)
 
         then:
-        def expect = Arrays.asList(getNikeOffWhiteNrgPantsBlack(),
-            getNikeStussyBeachPantsOffNoir(), getSupremeMeshPocketBeltedCargoPantsBlack())
-            .stream()
+        def expect = sortByViewCount(
+            Arrays.asList(getNikeOffWhiteNrgPantsBlack(), getNikeStussyBeachPantsOffNoir(),
+                getSupremeMeshPocketBeltedCargoPantsBlack()).stream())
             .map(p -> p.name)
             .collect(toList())
         List<String> actual = response.getBody().jsonPath().getList('name')
@@ -168,6 +185,34 @@ class ProductionIntegrationSpec extends BaseIntegrationSpec {
             .isEqualTo(expect)
     }
 
+    def "sort by #orderOption"() {
+        given:
+        def request = given(this.spec).accept(ContentType.JSON)
+            .params("orderOption", orderOption.name())
+            .filter(document("products/search/sort", SEARCH_API_REQUEST_PARAMS))
+            .log()
+            .all()
+
+        when:
+        def response = request.when().port(this.port).get(PRODUCTS_URL)
+
+        then:
+        List<String> actual = response.jsonPath().getList('name')
+
+        assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expect.collect(toList()))
+
+        where:
+        orderOption << [
+            OrderOption.POPULAR, OrderOption.RECENTLY_RELEASED
+        ]
+        expect << [
+            sortByViewCount(allProducts().stream()).limit(10).map(p -> p.name),
+            sortByReleaseDate(allProducts().stream()).limit(10).map(p -> p.name),
+        ]
+    }
 
     def "give 4xx errors when client uses wrong search options"() {
         given:

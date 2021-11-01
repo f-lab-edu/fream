@@ -1,6 +1,8 @@
 package kr.flab.fream.controller.product;
 
 import java.util.List;
+import kr.flab.fream.domain.product.OrderOption;
+import kr.flab.fream.domain.product.OrderOption.OrderOptionConverter;
 import kr.flab.fream.domain.product.SearchOption;
 import kr.flab.fream.domain.product.model.Product;
 import kr.flab.fream.domain.product.service.ProductService;
@@ -33,6 +35,7 @@ public class ProductController {
      * @param category    카테고리를 나타내는 문자열
      * @param brandIdList 브랜드 ID 목록
      * @param sizeIdList  사이즈 ID 목록
+     * @param orderOption 정렬 옵션 ({@link OrderOptionConverter} 에 의해 변환됨)
      * @return 상품 목록 리턴
      */
     @GetMapping
@@ -41,10 +44,11 @@ public class ProductController {
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) List<Long> brandIdList,
-            @RequestParam(required = false) List<Long> sizeIdList
+            @RequestParam(required = false) List<Long> sizeIdList,
+            @RequestParam(required = false) OrderOption orderOption
     ) {
         final var searchOption =
-                SearchOption.of(keyword, page, category, brandIdList, sizeIdList);
+                SearchOption.of(keyword, page, category, brandIdList, sizeIdList, orderOption);
 
         List<Product> productList = productService.search(searchOption);
 

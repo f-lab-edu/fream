@@ -1,9 +1,9 @@
 package kr.flab.fream.mybatis.mapper.product
 
 import kr.flab.domain.product.BrandFixtures
-import kr.flab.domain.product.ProductFixtures
 import kr.flab.domain.product.SizeFixtures
 import kr.flab.fream.DatabaseTest
+import kr.flab.fream.domain.product.OrderOption
 import kr.flab.fream.domain.product.SearchOption
 import kr.flab.fream.domain.product.model.Category
 import kr.flab.fream.domain.product.model.Sizes
@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
+import static kr.flab.domain.product.ProductFixtures.*
 import static org.assertj.core.api.Assertions.assertThat
 
 @MybatisTest
@@ -35,7 +36,7 @@ class ProductMapperSpec extends DatabaseTest {
         def size = SizeFixtures.createUs8Size()
         def brand = BrandFixtures.createBrand()
         def sizes = new Sizes(Arrays.asList(size))
-        def sneakers = ProductFixtures.createSneakers(brand, sizes)
+        def sneakers = createSneakers(brand, sizes)
 
         sizeMapper.addSize(size)
         brandMapper.addBrand(brand)
@@ -50,7 +51,7 @@ class ProductMapperSpec extends DatabaseTest {
         def size2 = SizeFixtures.createUs85Size()
         def brand = BrandFixtures.createBrand()
         def sizes = new Sizes(Arrays.asList(size, size2))
-        def sneakers = ProductFixtures.createSneakers(brand, sizes)
+        def sneakers = createSneakers(brand, sizes)
 
         sizeMapper.addSize(size)
         sizeMapper.addSize(size2)
@@ -103,7 +104,7 @@ class ProductMapperSpec extends DatabaseTest {
         def searchOption = SearchOption.builder()
             .categoriesOf(Category.CLOTHING.name())
             .build()
-        def expect = ProductFixtures.getClothes()
+        def expect = getClothes()
 
         expect:
         def actual = productMapper.search(searchOption)
@@ -124,8 +125,8 @@ class ProductMapperSpec extends DatabaseTest {
             .brandIdList(brandIds)
             .build()
         def expect =
-            Stream.concat(ProductFixtures.getNikeProducts().stream(),
-                ProductFixtures.getAdidasProducts().stream()).collect(Collectors.toList())
+            Stream.concat(getNikeProducts().stream(),
+                getAdidasProducts().stream()).collect(Collectors.toList())
 
         expect:
         def actual = productMapper.search(searchOption)
@@ -146,7 +147,7 @@ class ProductMapperSpec extends DatabaseTest {
         def searchOption = SearchOption.builder()
             .sizeIdList(sizeIds)
             .build()
-        def expect = ProductFixtures.getClothes()
+        def expect = getClothes()
 
         expect:
         def actual = productMapper.search(searchOption)
@@ -176,10 +177,44 @@ class ProductMapperSpec extends DatabaseTest {
             .brandIdList(brandIds)
             .build()
         def expect = Arrays.asList(
-            ProductFixtures.getNikeStussyBeachPantsOffNoir(),
-            ProductFixtures.getNikeOffWhiteNrgPantsBlack(),
-            ProductFixtures.getSupremeMeshPocketBeltedCargoPantsBlack()
+            getNikeStussyBeachPantsOffNoir(),
+            getNikeOffWhiteNrgPantsBlack(),
+            getSupremeMeshPocketBeltedCargoPantsBlack()
         )
+
+        expect:
+        def actual = productMapper.search(searchOption)
+        assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expect)
+    }
+
+    def "sort by View Counts"() {
+        given:
+        def searchOption = SearchOption.builder()
+            .orderOption(OrderOption.POPULAR)
+            .build()
+        def expect = sortByViewCount(allProducts().stream())
+            .limit(10)
+            .collect(Collectors.toList())
+
+        expect:
+        def actual = productMapper.search(searchOption)
+        assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expect)
+    }
+
+    def "sort by release date"() {
+        given:
+        def searchOption = SearchOption.builder()
+            .orderOption(OrderOption.RECENTLY_RELEASED)
+            .build()
+        def expect = sortByReleaseDate(allProducts().stream())
+            .limit(10)
+            .collect(Collectors.toList())
 
         expect:
         def actual = productMapper.search(searchOption)

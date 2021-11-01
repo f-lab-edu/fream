@@ -28,6 +28,7 @@ public final class SearchOption {
     private final Set<Category> categories;
     private final List<Long> brandIdList;
     private final List<Long> sizeIdList;
+    private final OrderOption orderOption;
 
     /**
      * 유저로부터 입력받은 키워드, 페이지 번호를 {@code SearchOption} 클래스로 묶어 반환.
@@ -37,16 +38,18 @@ public final class SearchOption {
      * @param categoryStr   상품 카테고리
      * @param brandIdList   브랜드 ID 목록
      * @param sizeIdList    사이즈 ID 목록
+     * @param orderOption   검색 옵션
      * @return 입력 값을 검증한 다음, 서비스 레이어에서 사용할 수 있는 {@link SearchOption} 을 리턴
      */
     public static SearchOption of(@Nullable String keywordString, @Nullable Integer page,
             @Nullable String categoryStr, @Nullable List<Long> brandIdList,
-            @Nullable List<Long> sizeIdList) {
+            @Nullable List<Long> sizeIdList, @Nullable OrderOption orderOption) {
         return builder().keyword(keywordString)
                 .page(page)
                 .categoriesOf(categoryStr)
                 .brandIdList(brandIdList)
                 .sizeIdList(sizeIdList)
+                .orderOption(orderOption)
                 .build();
     }
 
@@ -61,6 +64,7 @@ public final class SearchOption {
         private Set<Category> categories = new HashSet<>();
         private List<Long> brandIdList = new ArrayList<>();
         private List<Long> sizeIdList = new ArrayList<>();
+        private OrderOption orderOption = OrderOption.POPULAR;
 
         private SearchOptionBuilder() {
         }
@@ -116,9 +120,18 @@ public final class SearchOption {
             return this;
         }
 
+        public SearchOptionBuilder orderOption(OrderOption orderOption) {
+            if (orderOption == null) {
+                return this;
+            }
+
+            this.orderOption = orderOption;
+            return this;
+        }
+
         public SearchOption build() {
             return new SearchOption(this.keyword, this.rowBounds, this.categories,
-                    this.brandIdList, this.sizeIdList);
+                    this.brandIdList, this.sizeIdList, this.orderOption);
         }
     }
 

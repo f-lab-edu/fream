@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.flab.fream.mybatis.mapper.auction.AuctionMapper">
+    <resultMap id="auctionResultMap" type="kr.flab.fream.domain.auction.model.Auction">
+        <id column="id" property="id"/>
+        <result column="price" property="price"/>
+        <result column="due_date" property="dueDate"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="canceled_at" property="canceledAt"/>
+        <result column="signed_at" property="signedAt"/>
+        <association javaType="kr.flab.fream.domain.product.model.Product" property="product">
+            <result column="product_id" property="id"/>
+        </association>
+        <association javaType="kr.flab.fream.domain.product.model.Size" property="size">
+            <id column="size_id" property="id"/>
+        </association>
+        <discriminator javaType="kr.flab.fream.domain.auction.model.AuctionType" column="type">
+            <case value="ASK" resultType="kr.flab.fream.domain.auction.model.Ask"/>
+            <case value="BID" resultType="kr.flab.fream.domain.auction.model.Bid"/>
+        </discriminator>
+    </resultMap>
+
+    <delete id="cancel"
+        parameterType="kr.flab.fream.domain.auction.model.Auction">
+        UPDATE
+            auction
+        set canceled_at = NOW()
+        WHERE id = #{id}
+    </delete>
+
+    <insert id="create"
+        keyProperty="id"
+        parameterType="kr.flab.fream.domain.auction.model.Auction"
+        useGeneratedKeys="true">
+        INSERT INTO auction (price, product_id, size_id, created_at, due_date, type, user_id)
+        VALUES (#{price}, #{product.id}, #{size.id}, #{createdAt}, #{dueDate}, #{type}, #{user.id})
+    </insert>
+
+    <update id="update" parameterType="kr.flab.fream.domain.auction.model.Auction">
+        UPDATE auction
+        SET price      = #{price},
+            due_date   = #{dueDate},
+            product_id = #{product.id},
+            size_id    = #{size.id}
+        WHERE id = #{id}
+    </update>
+
+    <select id="getAuction" parameterType="long" resultMap="auctionResultMap">
+        SELECT *
+        FROM auction
+        WHERE id = #{id}
+    </select>
+
+</mapper>

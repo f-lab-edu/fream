@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import kr.flab.fream.domain.product.model.Product;
 import kr.flab.fream.domain.product.model.Size;
+import kr.flab.fream.domain.user.model.User;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
@@ -13,14 +16,21 @@ import lombok.Setter;
  * @since 1.0.0
  */
 @NoArgsConstructor
-@Setter
+@AllArgsConstructor
+@Getter
 public class Auction {
 
-    protected Long id;
-    protected BigDecimal price;
-    protected Product product;
-    protected Size size;
-    protected LocalDateTime createdAt;
-    protected LocalDateTime dueDate;
+    private Long id;
+    @Setter
+    private BigDecimal price;
+    private LocalDateTime createdAt;
+    @Setter
+    private LocalDateTime dueDate;
+    private Product product;
+    private Size size;
+    private User user;
+    private AuctionType type;
+    private LocalDateTime canceledAt;
+    private LocalDateTime signedAt;
 
 }

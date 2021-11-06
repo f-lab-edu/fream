@@ -18,4 +18,9 @@ public class Sizes {
 
     private List<Size> sizeList = new ArrayList<>();
 
+    public Size getSize(long id) {
+        return this.sizeList.stream().filter(size -> size.getId() == id).findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID와 일치하는 사이즈가 없습니다."));
+    }
+
 }

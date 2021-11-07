@@ -1,7 +1,10 @@
 package kr.flab.fream.domain.auction.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import kr.flab.fream.controller.auction.AuctionRequest;
 import kr.flab.fream.domain.product.model.Product;
 import kr.flab.fream.domain.product.model.Size;
 import kr.flab.fream.domain.user.model.User;
@@ -21,16 +24,25 @@ import lombok.Setter;
 public class Auction {
 
     private Long id;
-    @Setter
     private BigDecimal price;
     private LocalDateTime createdAt;
-    @Setter
     private LocalDateTime dueDate;
-    private Product product;
-    private Size size;
-    private User user;
     private AuctionType type;
     private LocalDateTime canceledAt;
     private LocalDateTime signedAt;
+
+    @Setter
+    private Product product;
+    @Setter
+    private Size size;
+    @Setter
+    private User user;
+
+    protected Auction(AuctionRequest auctionRequest, AuctionType type) {
+        this.price = auctionRequest.getPrice();
+        this.dueDate = LocalDateTime.of(LocalDate.now().plusDays(auctionRequest.getDueDays() + 1L),
+                LocalTime.MIDNIGHT);
+        this.type = type;
+    }
 
 }

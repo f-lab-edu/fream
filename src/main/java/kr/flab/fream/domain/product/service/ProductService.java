@@ -1,13 +1,10 @@
 package kr.flab.fream.domain.product.service;
 
 import java.util.List;
-import java.util.Optional;
-import kr.flab.fream.domain.product.Keyword;
 import kr.flab.fream.domain.product.SearchOption;
 import kr.flab.fream.domain.product.model.Product;
 import kr.flab.fream.mybatis.mapper.product.ProductMapper;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,6 +20,10 @@ public class ProductService {
 
     public List<Product> search(SearchOption searchOption) {
         return productMapper.search(searchOption);
+    }
+
+    public Product getProduct(Long id) {
+        return productMapper.getProductById(id);
     }
 
 }

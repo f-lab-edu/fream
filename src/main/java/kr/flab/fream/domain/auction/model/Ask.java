@@ -1,5 +1,7 @@
 package kr.flab.fream.domain.auction.model;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import kr.flab.fream.controller.auction.AuctionRequest;
 
 /**
@@ -7,7 +9,13 @@ import kr.flab.fream.controller.auction.AuctionRequest;
  *
  * @since 1.0.0
  */
-public final class Ask extends Auction {
+public class Ask extends Auction {
+
+    public Ask(Long id, BigDecimal price, LocalDateTime createdAt, LocalDateTime dueDate,
+            LocalDateTime canceledAt, LocalDateTime signedAt,
+            AuctionType type) {
+        super(id, price, createdAt, dueDate, canceledAt, signedAt, type);
+    }
 
     private Ask(AuctionRequest auctionRequest, AuctionType type) {
         super(auctionRequest, type);

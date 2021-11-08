@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS auction
     product_id  BIGINT         NOT NULL,
     size_id     BIGINT         NOT NULL,
     user_id     BIGINT         NOT NULL,
-    created_at  DATETIME       NOT NULL,
+    created_at  DATETIME       NOT NULL DEFAULT NOW(),
     due_date    DATETIME       NOT NULL COMMENT '입찰 마감 기한',
     canceled_at DATETIME COMMENT '입찰 취소한 시각',
     signed_at   DATETIME COMMENT '거래 체결된 시각'

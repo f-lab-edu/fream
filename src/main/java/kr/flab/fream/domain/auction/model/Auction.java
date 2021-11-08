@@ -8,7 +8,6 @@ import kr.flab.fream.controller.auction.AuctionRequest;
 import kr.flab.fream.domain.product.model.Product;
 import kr.flab.fream.domain.product.model.Size;
 import kr.flab.fream.domain.user.model.User;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,17 +18,19 @@ import lombok.Setter;
  * @since 1.0.0
  */
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 @Getter
 public class Auction {
 
     private Long id;
+    @Setter
     private BigDecimal price;
     private LocalDateTime createdAt;
     private LocalDateTime dueDate;
-    private AuctionType type;
     private LocalDateTime canceledAt;
     private LocalDateTime signedAt;
+    @Setter
+    private AuctionType type;
 
     @Setter
     private Product product;
@@ -38,11 +39,30 @@ public class Auction {
     @Setter
     private User user;
 
+    protected Auction(Long id, BigDecimal price, LocalDateTime createdAt, LocalDateTime dueDate,
+            LocalDateTime canceledAt, LocalDateTime signedAt, AuctionType type) {
+        this.id = id;
+        this.price = price;
+        this.createdAt = createdAt;
+        this.dueDate = dueDate;
+        this.canceledAt = canceledAt;
+        this.signedAt = signedAt;
+        this.type = type;
+    }
+
     protected Auction(AuctionRequest auctionRequest, AuctionType type) {
         this.price = auctionRequest.getPrice();
-        this.dueDate = LocalDateTime.of(LocalDate.now().plusDays(auctionRequest.getDueDays() + 1L),
-                LocalTime.MIDNIGHT);
         this.type = type;
+        setDueDate(auctionRequest.getDueDays());
+    }
+
+    private void setDueDate(long dueDays) {
+        this.dueDate = LocalDateTime.of(LocalDate.now().plusDays(dueDays + 1L),
+                LocalTime.MIDNIGHT);
+    }
+
+    public void setDueDaysFromToday(long dueDays) {
+        setDueDate(dueDays);
     }
 
 }

@@ -1,6 +1,7 @@
 package kr.flab.fream.domain.user.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 public class User {
 
     private Long id;

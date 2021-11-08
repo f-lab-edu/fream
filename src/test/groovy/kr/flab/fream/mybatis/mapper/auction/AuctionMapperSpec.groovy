@@ -1,39 +1,35 @@
 package kr.flab.fream.mybatis.mapper.auction
 
 import kr.flab.domain.auction.AuctionFixtures
+import kr.flab.fream.DatabaseTest
 import kr.flab.fream.domain.auction.model.AuctionType
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import spock.lang.Specification
-
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
 
 import static kr.flab.domain.product.ProductFixtures.nikeDunkLowRetroBlack
 
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class AuctionMapperSpec extends Specification {
+class AuctionMapperSpec extends DatabaseTest {
 
     @Autowired
     AuctionMapper auctionMapper
 
-    def "save Ask and Bid"() {
+    def "save Auction"() {
         given:
-        def auction = AuctionFixtures.create("284000", getNikeDunkLowRetroBlack(), "265", 60, type)
+        def product = getNikeDunkLowRetroBlack()
+        def auction = AuctionFixtures.create("284000", product, product.getSize(1L), 60, AuctionType.ASK)
 
         expect:
         auctionMapper.create(auction) == 1
-
-        where:
-        type << [AuctionType.ASK, AuctionType.BID]
     }
 
     def "cancel auction by removing that"() {
         given:
-        def auction = AuctionFixtures.create("284000", getNikeDunkLowRetroBlack(), "265", 60, AuctionType.ASK)
+        def product = getNikeDunkLowRetroBlack()
+        def auction = AuctionFixtures.create("284000", product, product.getSize(1L), 60, AuctionType.ASK)
+
         auctionMapper.create(auction)
 
         expect:
@@ -46,13 +42,12 @@ class AuctionMapperSpec extends Specification {
 
     def "update Bid"() {
         given:
-        def auction = AuctionFixtures.create("284000", getNikeDunkLowRetroBlack(), "265", 60, AuctionType.ASK)
+        def product = getNikeDunkLowRetroBlack()
+        def auction = AuctionFixtures.create("284000", product, product.getSize(1L), 60, AuctionType.BID)
         auctionMapper.create(auction)
 
-        def newDueDate = LocalDateTime.of(LocalDate.now().plusDays(31), LocalTime.MIDNIGHT)
-        def newPrice = new BigDecimal("280000")
-        auction.setDueDate(newDueDate)
-        auction.setPrice(newPrice)
+        auction.setDueDaysFromToday(30)
+        auction.setPrice(new BigDecimal("280000"))
 
         expect:
         auctionMapper.update(auction) == 1

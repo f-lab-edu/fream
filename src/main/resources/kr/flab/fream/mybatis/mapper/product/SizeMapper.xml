@@ -22,4 +22,10 @@
     </foreach>
   </insert>
 
+  <select id="getSize" parameterType="long" resultType="kr.flab.fream.domain.product.model.Size">
+    SELECT S.id AS ID, S.name AS name
+    FROM size S
+    WHERE S.id = #{id}
+  </select>
+
 </mapper>

@@ -6,7 +6,6 @@ import kr.flab.domain.product.ProductFixtures
 import kr.flab.fream.config.FormattingConfiguration
 import kr.flab.fream.config.ModelMapperConfiguration
 import kr.flab.fream.controller.product.ProductDto
-import kr.flab.fream.domain.auction.model.Ask
 import kr.flab.fream.domain.auction.model.AuctionType
 import kr.flab.fream.domain.auction.service.AuctionService
 import kr.flab.fream.domain.user.model.User
@@ -56,13 +55,14 @@ class AuctionControllerSpec extends Specification {
 
         where:
         requestBody << [
-            new AuctionRequest(new BigDecimal(-1), 1, 1, 1, 1),
-            new AuctionRequest(null, 1, 1, 1, 1),
-            new AuctionRequest(new BigDecimal(100_000), null, 1, 1, 1),
-            new AuctionRequest(new BigDecimal(100_000), 1, null, 1, 1),
-            new AuctionRequest(new BigDecimal(100_000), 1, 1, null, 1),
-            new AuctionRequest(new BigDecimal(100_000), 1, 1, 1, 0),
-            new AuctionRequest(new BigDecimal(100_000), 1, 1, 1, null),
+            new AuctionRequest(new BigDecimal(-1), 1, 1, 1, 1, AuctionType.ASK),
+            new AuctionRequest(null, 1, 1, 1, 1, AuctionType.ASK),
+            new AuctionRequest(new BigDecimal(100_000), null, 1, 1, 1, AuctionType.ASK),
+            new AuctionRequest(new BigDecimal(100_000), 1, null, 1, 1, AuctionType.ASK),
+            new AuctionRequest(new BigDecimal(100_000), 1, 1, null, 1, AuctionType.ASK),
+            new AuctionRequest(new BigDecimal(100_000), 1, 1, 1, 0, AuctionType.ASK),
+            new AuctionRequest(new BigDecimal(100_000), 1, 1, 1, null, AuctionType.ASK),
+            new AuctionRequest(new BigDecimal(100_000), 1, 1, 1, null, null),
         ]
         testcase << [
             "price is less than 0",
@@ -72,23 +72,24 @@ class AuctionControllerSpec extends Specification {
             "null userId",
             "duyDays is less than 1",
             "null duyDays",
+            "null auctionType"
         ]
     }
 
-    def "return 200 with valid ask request"() {
+    def "return 200 with valid creating '#type' request"() {
         given:
-        def auctionRequest = new AuctionRequest(new BigDecimal(100_000), 1, 1, 1, 1)
-        def ask = Ask.of(auctionRequest)
+        def auctionRequest = new AuctionRequest(new BigDecimal(100_000), 1, 1, 1, 1, type)
+        def auction = type.constructor.apply(auctionRequest)
         def product = ProductFixtures.getNikeDunkLowRetroBlack()
         def size = product.sizes.sizeList.get(0)
-        ask.user = new User(1)
-        ask.product = product
-        ask.size = size
+        auction.setUser(new User(1))
+        auction.setProduct(product)
+        auction.setSize(size)
 
-        auctionService.ask(_ as AuctionRequest) >> ask
+        auctionService.createAuction(_ as AuctionRequest) >> auction
 
         when:
-        def resultActions = mockMvc.perform(post(ASK_URL)
+        def resultActions = mockMvc.perform(post(url)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(auctionRequest)))
 
@@ -100,7 +101,7 @@ class AuctionControllerSpec extends Specification {
                 product.getCategory().name(), product.getBrand().getName(),
                 product.getBrand().getEnglishName()),
             size.getName(),
-            AuctionType.ASK
+            type
         )
 
         def result = resultActions.andExpect(status().is(HttpStatus.OK.value()))
@@ -110,6 +111,10 @@ class AuctionControllerSpec extends Specification {
         def json = result.getResponse().getContentAsString(Charset.forName("UTF-8"))
         objectMapper.readValue(json, AuctionDto.class) == auctionDto
 
+        where:
+        url             || type
+        "/auction/asks" || AuctionType.ASK
+        "/auction/bids" || AuctionType.BID
     }
 
 }

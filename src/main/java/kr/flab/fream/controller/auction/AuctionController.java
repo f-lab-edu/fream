@@ -25,15 +25,15 @@ public class AuctionController {
     private final ModelMapper modelMapper;
 
     /**
-     * 판매 입찰 생성 API.
+     * 입찰 생성 API.
      *
      * @param request 입찰 정보
      * @return 생성된 입찰 정보를 반환
      */
-    @PostMapping("/asks")
-    public AuctionDto ask(@Valid @RequestBody AuctionRequest request) {
-        Auction ask = service.ask(request);
-        return modelMapper.map(ask, new TypeToken<AuctionDto>() {
+    @PostMapping(value = {"/asks", "bids"})
+    public AuctionDto createAuction(@Valid @RequestBody AuctionRequest request) {
+        Auction auction = service.createAuction(request);
+        return modelMapper.map(auction, new TypeToken<AuctionDto>() {
         }.getType());
     }
 

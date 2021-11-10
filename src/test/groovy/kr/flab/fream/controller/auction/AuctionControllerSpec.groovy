@@ -94,6 +94,10 @@ class AuctionControllerSpec extends Specification {
             .content(objectMapper.writeValueAsString(auctionRequest)))
 
         then:
+        def result = resultActions.andExpect(status().is(HttpStatus.CREATED.value()))
+            .andReturn()
+
+        and:
         AuctionDto auctionDto = new AuctionDto(null,
             new BigDecimal(100_000),
             LocalDateTime.of(LocalDate.now().plusDays(2), LocalTime.MIDNIGHT),
@@ -103,12 +107,8 @@ class AuctionControllerSpec extends Specification {
             size.getName(),
             type
         )
-
-        def result = resultActions.andExpect(status().is(HttpStatus.OK.value()))
-            .andReturn()
-
-        and:
         def json = result.getResponse().getContentAsString(Charset.forName("UTF-8"))
+
         objectMapper.readValue(json, AuctionDto.class) == auctionDto
 
         where:

@@ -6,9 +6,11 @@ import kr.flab.fream.domain.auction.service.AuctionService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -31,6 +33,7 @@ public class AuctionController {
      * @return 생성된 입찰 정보를 반환
      */
     @PostMapping(value = {"/asks", "bids"})
+    @ResponseStatus(HttpStatus.CREATED)
     public AuctionDto createAuction(@Valid @RequestBody AuctionRequest request) {
         Auction auction = service.createAuction(request);
         return modelMapper.map(auction, new TypeToken<AuctionDto>() {

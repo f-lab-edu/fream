@@ -1,7 +1,6 @@
 package kr.flab.fream.domain.auction.service;
 
 import kr.flab.fream.controller.auction.AuctionRequest;
-import kr.flab.fream.domain.auction.model.Ask;
 import kr.flab.fream.domain.auction.model.Auction;
 import kr.flab.fream.domain.product.model.Product;
 import kr.flab.fream.domain.product.model.Size;
@@ -33,8 +32,8 @@ public class AuctionService {
      * @param request 유저가 입력한 입찰 정보.
      * @return 입찰을 생성한 뒤 반환.
      */
-    public Auction ask(AuctionRequest request) {
-        Auction auction = Ask.of(request);
+    public Auction createAuction(AuctionRequest request) {
+        Auction auction = request.getType().constructor.apply(request);
 
         Product product = productService.getProduct(request.getProductId());
         Size size = product.getSize(request.getSizeId());

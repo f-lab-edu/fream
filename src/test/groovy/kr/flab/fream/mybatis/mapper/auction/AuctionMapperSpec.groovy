@@ -28,7 +28,7 @@ class AuctionMapperSpec extends DatabaseTest {
     def "cancel auction by removing that"() {
         given:
         def product = getNikeDunkLowRetroBlack()
-        def auction = AuctionFixtures.create("284000", product, product.getSize(1L), 60, AuctionType.ASK)
+        def auction = AuctionFixtures.create("284000", product, product.getSize(1L), 60, type)
 
         auctionMapper.create(auction)
 
@@ -38,6 +38,9 @@ class AuctionMapperSpec extends DatabaseTest {
         and:
         def updatedAuction = auctionMapper.getAuction(auction.id)
         updatedAuction.canceledAt != null
+
+        where:
+        type << [AuctionType.ASK, AuctionType.BID]
     }
 
     def "update Bid"() {

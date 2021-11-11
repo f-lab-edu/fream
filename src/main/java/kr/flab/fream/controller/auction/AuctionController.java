@@ -32,7 +32,7 @@ public class AuctionController {
      * @param request 입찰 정보
      * @return 생성된 입찰 정보를 반환
      */
-    @PostMapping(value = {"/asks", "bids"})
+    @PostMapping(value = {"/asks", "/bids"})
     @ResponseStatus(HttpStatus.CREATED)
     public AuctionDto createAuction(@Valid @RequestBody AuctionRequest request) {
         Auction auction = service.createAuction(request);

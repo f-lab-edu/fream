@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.flab.fream.mybatis.mapper.user.UserMapper">
+    <resultMap id="userResultMap" type="kr.flab.fream.domain.user.model.User">
+        <id column="id" property="id"/>
+    </resultMap>
+
+    <select id="getUser" parameterType="long" resultMap="userResultMap">
+        SELECT id
+        FROM (SELECT 1 AS id) user
+        WHERE id = #{id}
+    </select>
+
+</mapper>

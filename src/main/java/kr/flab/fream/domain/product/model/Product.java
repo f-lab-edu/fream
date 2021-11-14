@@ -29,4 +29,8 @@ public class Product {
     private Sizes sizes;
     private Long viewCount;
 
+    public Size getSize(Long id) {
+        return sizes.getSize(id);
+    }
+
 }

@@ -66,5 +66,11 @@ public class SizeFixtures {
         return new Size(null, "US 8.5");
     }
 
+    public static Size getSizeFromList(List<Size> sizeList, String name) {
+        return sizeList.stream()
+                .filter(size -> size.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+    }
 
 }

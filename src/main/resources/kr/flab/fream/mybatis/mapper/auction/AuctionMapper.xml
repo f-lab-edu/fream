@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.flab.fream.mybatis.mapper.auction.AuctionMapper">
+    <resultMap id="auctionResultMap" type="kr.flab.fream.domain.auction.model.Auction">
+        <constructor>
+            <idArg column="id" javaType="long"/>
+            <arg column="price" javaType="java.math.BigDecimal"/>
+            <arg column="due_date" javaType="java.time.LocalDateTime"/>
+            <arg column="created_at" javaType="java.time.LocalDateTime"/>
+            <arg column="canceled_at" javaType="java.time.LocalDateTime"/>
+            <arg column="signed_at" javaType="java.time.LocalDateTime"/>
+            <arg column="type" javaType="kr.flab.fream.domain.auction.model.AuctionType"/>
+        </constructor>
+        <association javaType="kr.flab.fream.domain.product.model.Product" property="product"
+            fetchType="lazy"
+            column="product_id"
+            select="kr.flab.fream.mybatis.mapper.product.ProductMapper.getProductById"/>
+        <association javaType="kr.flab.fream.domain.product.model.Size" property="size"
+            fetchType="lazy"
+            column="size_id"
+            select="kr.flab.fream.mybatis.mapper.product.SizeMapper.getSize"
+        />
+        <association property="user" javaType="kr.flab.fream.domain.user.model.User"
+            fetchType="lazy"
+            column="user_id"
+            select="kr.flab.fream.mybatis.mapper.user.UserMapper.getUser"/>
+        <discriminator javaType="kr.flab.fream.domain.auction.model.AuctionType" column="type">
+            <case value="ASK" resultType="kr.flab.fream.domain.auction.model.Ask"/>
+            <case value="BID" resultType="kr.flab.fream.domain.auction.model.Bid"/>
+        </discriminator>
+    </resultMap>
+
+    <delete id="cancel"
+        parameterType="kr.flab.fream.domain.auction.model.Auction">
+        UPDATE
+            auction
+        set canceled_at = NOW()
+        WHERE id = #{id}
+    </delete>
+
+    <insert id="create"
+        keyProperty="id"
+        parameterType="kr.flab.fream.domain.auction.model.Auction"
+        useGeneratedKeys="true">
+        INSERT INTO auction (price, product_id, size_id, due_date, type, user_id)
+        VALUES (#{price}, #{product.id}, #{size.id}, #{dueDate}, #{type}, #{user.id})
+    </insert>
+
+    <update id="update" parameterType="kr.flab.fream.domain.auction.model.Auction">
+        UPDATE auction
+        SET price      = #{price},
+            due_date   = #{dueDate},
+            product_id = #{product.id},
+            size_id    = #{size.id}
+        WHERE id = #{id}
+    </update>
+
+    <select id="getAuction" parameterType="long" resultMap="auctionResultMap">
+        SELECT A.id          AS id,
+               A.price       AS price,
+               A.created_at  AS created_at,
+               A.due_date    AS due_date,
+               A.canceled_at AS canceled_at,
+               A.signed_at   AS signed_at,
+               A.product_id  AS product_id,
+               A.size_id     AS size_id,
+               A.id          AS user_id,
+               A.type        AS type
+        FROM auction AS A
+        WHERE A.id = #{id}
+    </select>
+
+</mapper>

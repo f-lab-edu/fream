@@ -10,7 +10,11 @@ import org.springframework.stereotype.Service;
 public class TemporaryUserService implements UserService {
 
     @Override
+
     public User getUser(Long id) {
-        return new User(id);
+        //return new User(id);
+        return null;
     }
+
+
 }

@@ -6,10 +6,11 @@ import kr.flab.fream.mybatis.mapper.product.SizeMapper
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
+import spock.lang.Specification
 
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class SizeMapperSpec extends DatabaseTest {
+class SizeMapperSpec extends Specification {
 
     @Autowired
     SizeMapper sizeMapper

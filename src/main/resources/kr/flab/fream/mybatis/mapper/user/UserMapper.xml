@@ -11,21 +11,31 @@
         <result column="email" property="email"/>
         <result column="phone" property="phone"/>
         <result column="account" property="account"/>
-        <!--
-        <collection javaType="ArrayList" ofType="kr.flab.fream.domain.user.model.AddressBook"
-          property="user.addressBook">
-            <id column="address" property="address"/>
+        <collection  ofType="kr.flab.fream.domain.user.model.Address"
+          property="addressBook">
+            <id column="address_id" property="id"/>
+            <result column="address" property="address"/>
             <result column="address_detail" property="addressDetail"/>
             <result column="alias" property="alias"/>
             <result column="is_default" property="isDefault"/>
         </collection>
-        -->
     </resultMap>
 
     <select id="getUser" parameterType="long" resultMap="userResultMap">
-        SELECT *
-        FROM  users
-        WHERE id = #{id}
+        SELECT u.id AS id,
+               u.name AS name,
+               u.password AS password,
+               u.email AS email,
+               u.phone AS phone,
+               u.account AS account,
+               a.id AS address_id,
+               a.address AS address,
+               a.address_detail AS address_detail,
+               a.is_default AS is_default,
+               a.alias AS alias
+        FROM  users AS u
+            JOIN address AS a ON u.id = a.user_id
+        WHERE u.id = #{id}
     </select>
 
     <insert id="joinUser"  keyProperty="id"   parameterType="kr.flab.fream.domain.user.model.User"   useGeneratedKeys="true">

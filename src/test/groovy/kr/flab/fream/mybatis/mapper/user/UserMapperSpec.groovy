@@ -1,6 +1,6 @@
 package kr.flab.fream.mybatis.mapper.user
 
-
+import kr.flab.fream.DatabaseTest
 import kr.flab.fream.domain.user.model.User
 import kr.flab.fream.mybatis.mapper.product.ProductMapper
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
@@ -10,12 +10,12 @@ import spock.lang.Specification
 
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class UserMapperSpec extends Specification {
+class UserMapperSpec extends DatabaseTest {
 
     @Autowired
     UserMapper userMapper;
     @Autowired
-    ProductMapper productMapper;
+    AddressMapper addressMapper;
 
     def "update user"() {
         given:
@@ -49,14 +49,15 @@ class UserMapperSpec extends Specification {
         user.setId(1);
 
         expect:
-        userMapper.getUser(1).getPassword()=="1234"
+        userMapper.getUser(1).getAddressBook().size()==3
     }
 
     def "delete user"() {
         given:
         def user = new User();
         user.setId(1);
-
+        user.setAddressBook(addressMapper.getAllAddress(user));
+        addressMapper.deleteAddress(user.getAddressBook());
         expect:
         userMapper.deleteUser(user) == 1
     }

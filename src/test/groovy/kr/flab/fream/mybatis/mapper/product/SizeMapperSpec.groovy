@@ -10,7 +10,7 @@ import spock.lang.Specification
 
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class SizeMapperSpec extends Specification {
+class SizeMapperSpec extends DatabaseTest {
 
     @Autowired
     SizeMapper sizeMapper

@@ -1,5 +1,6 @@
 package kr.flab.fream.mybatis.mapper.user
 
+import kr.flab.fream.DatabaseTest
 import kr.flab.fream.domain.user.model.Address
 
 import kr.flab.fream.domain.user.model.User
@@ -9,7 +10,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import spock.lang.Specification
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class AddressMapperSpec extends Specification {
+class AddressMapperSpec extends DatabaseTest {
     @Autowired
     AddressMapper addressMapper;
     def "add address"() {

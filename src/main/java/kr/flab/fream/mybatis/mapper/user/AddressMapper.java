@@ -6,7 +6,9 @@ import kr.flab.fream.domain.user.model.User;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * {@link User} 의 Mapper
+ * {@link User} 의 Mapper.
+ *
+ * @since 1.0.0
  */
 @Mapper
 public interface AddressMapper {

@@ -13,4 +13,10 @@ public interface UserMapper {
 
     User getUser(Long id);
 
+    int joinUser(User user);
+
+    int updateUser(User user);
+
+    int deleteUser(User user);
+
 }

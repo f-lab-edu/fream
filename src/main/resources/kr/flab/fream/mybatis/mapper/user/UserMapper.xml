@@ -6,12 +6,67 @@
 <mapper namespace="kr.flab.fream.mybatis.mapper.user.UserMapper">
     <resultMap id="userResultMap" type="kr.flab.fream.domain.user.model.User">
         <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="password" property="password"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="account" property="account"/>
+        <collection  ofType="kr.flab.fream.domain.user.model.Address"
+          property="addressBook">
+            <id column="address_id" property="id"/>
+            <result column="address" property="address"/>
+            <result column="address_detail" property="addressDetail"/>
+            <result column="alias" property="alias"/>
+            <result column="is_default" property="isDefault"/>
+        </collection>
     </resultMap>
 
     <select id="getUser" parameterType="long" resultMap="userResultMap">
-        SELECT id
-        FROM (SELECT 1 AS id) user
-        WHERE id = #{id}
+        SELECT u.id AS id,
+               u.name AS name,
+               u.password AS password,
+               u.email AS email,
+               u.phone AS phone,
+               u.account AS account,
+               a.id AS address_id,
+               a.address AS address,
+               a.address_detail AS address_detail,
+               a.is_default AS is_default,
+               a.alias AS alias
+        FROM  user AS u
+            JOIN address AS a ON u.id = a.user_id
+        WHERE u.id = #{id}
     </select>
 
+    <insert id="joinUser"  keyProperty="id"   parameterType="kr.flab.fream.domain.user.model.User"   useGeneratedKeys="true">
+        INSERT INTO user (password, name, email, phone,
+                           account)
+        VALUES (#{password}, #{name}, #{email}, #{phone},
+                #{account})
+    </insert>
+
+    <update id="updateUser" parameterType="kr.flab.fream.domain.user.model.User"  >
+        UPDATE user
+        SET
+            <if test="password !=null">
+                password = #{password},
+            </if>
+            <if test="email !=null">
+                email = #{email},
+            </if>
+            <if test="email !=null">
+                account = #{account},
+            </if>
+            <if test="name !=null">
+                name = #{name}
+            </if>
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteUser" parameterType="kr.flab.fream.domain.user.model.User">
+        delete
+        from
+            user
+        where
+            id = #{id}
+    </delete>
 </mapper>

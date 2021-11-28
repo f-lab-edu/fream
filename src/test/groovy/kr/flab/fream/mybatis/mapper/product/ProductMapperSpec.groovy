@@ -11,6 +11,7 @@ import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguratio
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
+import spock.lang.Specification
 
 import java.util.stream.Collectors
 import java.util.stream.Stream

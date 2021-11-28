@@ -38,3 +38,4 @@ class AuctionIntegrationSpec extends BaseIntegrationSpec {
     }
 
 }
+

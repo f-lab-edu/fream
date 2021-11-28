@@ -20,7 +20,7 @@ class UserMapperSpec extends DatabaseTest {
     def "update user"() {
         given:
         def user = new User();
-        user.setId(1);
+        user.setId(1L);
         user.setEmail("test@gmil.com");
         user.setAccount("test");
         user.setName("mapperTest");
@@ -28,7 +28,7 @@ class UserMapperSpec extends DatabaseTest {
         userMapper.updateUser(user);
 
         expect:
-        userMapper.getUser(1).getPassword() == "ggggg"
+        userMapper.getUser(1L).getPassword() == "ggggg"
     }
 
     def "add user"() {
@@ -46,16 +46,16 @@ class UserMapperSpec extends DatabaseTest {
     def "get user"() {
         given:
         def user = new User();
-        user.setId(1);
+        user.setId(1L);
 
         expect:
-        userMapper.getUser(1).getAddressBook().size()==3
+        userMapper.getUser(1L).getAddressBook().size()==3
     }
 
     def "delete user"() {
         given:
         def user = new User();
-        user.setId(1);
+        user.setId(1L);
         user.setAddressBook(addressMapper.getAllAddress(user));
         addressMapper.deleteAddress(user.getAddressBook());
         expect:

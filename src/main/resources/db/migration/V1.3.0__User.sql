@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS users
+CREATE TABLE IF NOT EXISTS `user`
 (
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '사용자 ID',
     password VARCHAR(200) NOT NULL COMMENT '비밀번호(암호화)',
@@ -17,5 +17,5 @@ CREATE TABLE IF NOT EXISTS address
     address VARCHAR(128) COMMENT '주소',
     address_detail VARCHAR(128) COMMENT '상세주소',
     is_default TINYINT,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES `user`(id)
     );

@@ -1,6 +1,8 @@
 package kr.flab.fream.domain.user.service;
 
 import kr.flab.fream.domain.user.model.User;
+import kr.flab.fream.mybatis.mapper.user.UserMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -9,11 +11,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class TemporaryUserService implements UserService {
 
-    @Override
+    @Autowired
+    UserMapper userMapper;
 
     public User getUser(Long id) {
-        //return new User(id);
-        return null;
+        return userMapper.getUser(id);
+        //return null;
     }
 
 

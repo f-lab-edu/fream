@@ -33,20 +33,20 @@
                a.address_detail AS address_detail,
                a.is_default AS is_default,
                a.alias AS alias
-        FROM  users AS u
+        FROM  user AS u
             JOIN address AS a ON u.id = a.user_id
         WHERE u.id = #{id}
     </select>
 
     <insert id="joinUser"  keyProperty="id"   parameterType="kr.flab.fream.domain.user.model.User"   useGeneratedKeys="true">
-        INSERT INTO users (password, name, email, phone,
+        INSERT INTO user (password, name, email, phone,
                            account)
         VALUES (#{password}, #{name}, #{email}, #{phone},
                 #{account})
     </insert>
 
     <update id="updateUser" parameterType="kr.flab.fream.domain.user.model.User"  >
-        UPDATE users
+        UPDATE user
         SET
             <if test="password !=null">
                 password = #{password},
@@ -65,7 +65,7 @@
     <delete id="deleteUser" parameterType="kr.flab.fream.domain.user.model.User">
         delete
         from
-            users
+            user
         where
             id = #{id}
     </delete>

@@ -1,5 +1,6 @@
 package kr.flab.fream.domain.user.model;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +23,8 @@ public class User {
     private String email;
     private String phone;
     private String account;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public User(Long id) {
         this.id = id;

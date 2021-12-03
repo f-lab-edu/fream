@@ -49,8 +49,7 @@ class AuctionMapperSpec extends DatabaseTest {
         def auction = AuctionFixtures.create("284000", product, product.getSize(1L), 60, AuctionType.BID)
         auctionMapper.create(auction)
 
-        auction.setDueDaysFromToday(30)
-        auction.setPrice(new BigDecimal("280000"))
+        auction.update(new BigDecimal("280000"), 30L)
 
         expect:
         auctionMapper.update(auction) == 1

@@ -3,6 +3,7 @@ package kr.flab.fream.controller.auction;
 import java.math.BigDecimal;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -27,10 +28,12 @@ import lombok.experimental.FieldDefaults;
 public class AuctionPatchRequest {
 
     @Min(0)
+    @NotNull
     BigDecimal price;
 
     @Min(1)
     @Max(60)
+    @NotNull
     Long dueDays;
 
 }

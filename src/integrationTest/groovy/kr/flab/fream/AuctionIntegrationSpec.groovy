@@ -37,5 +37,42 @@ class AuctionIntegrationSpec extends BaseIntegrationSpec {
         ]
     }
 
+    def "update an auction - type: #type"() {
+        given:
+        def reqBody = Map.of("price", "200000", "dueDays", "1")
+
+        def request = given(this.spec).contentType(ContentType.JSON).body(reqBody)
+            .filter(document("auction/" + type + "s/id"))
+            .log()
+            .all()
+
+
+        when:
+        def response = request.when().port(this.port).patch("/auction/asks/" + id)
+
+        then:
+        response.getStatusCode() == HttpStatus.OK.value()
+
+        where:
+        type << [
+            "ask", "bid",
+        ]
+        id << [1, 2]
+    }
+
+    def "cancel an auction"() {
+        given:
+        def request = given(this.spec)
+            .filter(document("auction/asks"))
+            .log()
+            .all()
+
+        when:
+        def response = request.when().port(this.port).delete("/auction/asks/1")
+
+        then:
+        response.getStatusCode() == HttpStatus.NO_CONTENT.value()
+    }
+
 }
 

@@ -9,6 +9,7 @@ import kr.flab.fream.controller.product.ProductDto
 import kr.flab.fream.domain.auction.model.AuctionType
 import kr.flab.fream.domain.auction.service.AuctionService
 import kr.flab.fream.domain.user.model.User
+import org.modelmapper.ModelMapper
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import spock.lang.Specification
 
 import java.nio.charset.Charset
@@ -38,9 +40,14 @@ class AuctionControllerSpec extends Specification {
     @Autowired
     ObjectMapper objectMapper
 
+    @Autowired
+    ModelMapper modelMapper
+
     @SpringBean
     AuctionService auctionService = Stub()
 
+    @SuppressWarnings("unused")
+    // IntelliJ 가 spock setup 을 인식하지 못함
     void setup() {
         objectMapper.registerModule(new JavaTimeModule())
     }
@@ -86,7 +93,7 @@ class AuctionControllerSpec extends Specification {
         auction.setProduct(product)
         auction.setSize(size)
 
-        auctionService.createAuction(_ as AuctionRequest) >> auction
+        auctionService.createAuction(_ as AuctionRequest) >> modelMapper.map(auction, AuctionDto.getTypeObject())
 
         when:
         def resultActions = mockMvc.perform(post(url)
@@ -115,6 +122,34 @@ class AuctionControllerSpec extends Specification {
         url             || type
         "/auction/asks" || AuctionType.ASK
         "/auction/bids" || AuctionType.BID
+    }
+
+    def "return 400 if invalid update request - #url, #request.second"() {
+        given:
+        String targetUrl = url + "/1"
+        AuctionPatchRequest patchRequest = (request as Tuple2<AuctionPatchRequest, String>).getV1()
+
+        def builder = MockMvcRequestBuilders.patch(targetUrl)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(patchRequest))
+
+        when:
+        def resultActions = mockMvc.perform(builder)
+
+        then:
+        resultActions.andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+
+        where:
+        [request, url] << [
+            [
+                new Tuple2<>(new AuctionPatchRequest(new BigDecimal(-1), 1), "invalid price"),
+                new Tuple2<>(new AuctionPatchRequest(new BigDecimal(10000), 0), "invalid under 1 due day"),
+                new Tuple2<>(new AuctionPatchRequest(new BigDecimal(10000), 61), "exceed dueDays"),
+                new Tuple2<>(new AuctionPatchRequest(new BigDecimal(10000), null), "null dueDays"),
+                new Tuple2<>(new AuctionPatchRequest(null, 1), "null price"),
+            ],
+            ["/auction/asks", "/auction/bids"]
+        ].combinations()
     }
 
 }

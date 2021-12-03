@@ -60,7 +60,7 @@ class AuctionServiceSpec extends Specification {
         def auction = sut.createAuction(request)
 
         then:
-        auction == modelMapper.map(targetProduct, AuctionDto.getType())
+        auction == modelMapper.map(targetProduct, AuctionDto.getTypeObject())
 
         where:
         type << [AuctionType.ASK, AuctionType.BID]

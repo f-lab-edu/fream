@@ -1,12 +1,13 @@
 package kr.flab.fream.controller.auction;
 
 import javax.validation.Valid;
-import kr.flab.fream.domain.auction.model.Auction;
+import javax.validation.constraints.NotNull;
 import kr.flab.fream.domain.auction.service.AuctionService;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuctionController {
 
     private final AuctionService service;
-    private final ModelMapper modelMapper;
 
     /**
      * 입찰 생성 API.
@@ -35,9 +35,28 @@ public class AuctionController {
     @PostMapping(value = {"/asks", "/bids"})
     @ResponseStatus(HttpStatus.CREATED)
     public AuctionDto createAuction(@Valid @RequestBody AuctionRequest request) {
-        Auction auction = service.createAuction(request);
-        return modelMapper.map(auction, new TypeToken<AuctionDto>() {
-        }.getType());
+        return service.createAuction(request);
+    }
+
+    /**
+     * 입찰 수정 API.
+     *
+     * @param request 수정할 내용이 포함된 입찰 정보
+     * @return 수정된 입찰 정보를 반환
+     */
+    @PatchMapping(value = {"/asks/{id}", "/bids/{id}"})
+    @ResponseStatus(HttpStatus.OK)
+    public AuctionDto modifyAuction(
+            @Valid @PathVariable @NotNull Long id,
+            @Valid @RequestBody AuctionPatchRequest request) {
+        return service.update(id, request);
+    }
+
+    @DeleteMapping(value = {"/asks/{id}", "/bids/{id}"})
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cancelAuction(
+            @Valid @PathVariable @NotNull Long id) {
+        service.cancel(id);
     }
 
 }

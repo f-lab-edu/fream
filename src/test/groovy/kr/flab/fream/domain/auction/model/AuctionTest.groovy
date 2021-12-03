@@ -170,7 +170,7 @@ class AuctionTest extends Specification {
         def auction = canceledAuction()
 
         when:
-        auction.sign()
+        auction.cancel()
 
         then:
         thrown(IllegalStateException)

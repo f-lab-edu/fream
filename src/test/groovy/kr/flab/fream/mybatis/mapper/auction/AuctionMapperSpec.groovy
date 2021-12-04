@@ -3,6 +3,7 @@ package kr.flab.fream.mybatis.mapper.auction
 import kr.flab.domain.auction.AuctionFixtures
 import kr.flab.fream.DatabaseTest
 import kr.flab.fream.domain.auction.model.AuctionType
+import kr.flab.fream.domain.user.model.User
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
@@ -53,6 +54,25 @@ class AuctionMapperSpec extends DatabaseTest {
 
         expect:
         auctionMapper.update(auction) == 1
+    }
+
+    def "set counterparty"() {
+        given:
+        def product = getNikeDunkLowRetroBlack()
+        def auction = AuctionFixtures.create("284000", product, product.getSize(1L), 60, AuctionType.BID)
+        auctionMapper.create(auction)
+
+        def user = new User()
+        user.id = 1L
+
+        auction.sign(user)
+
+        expect:
+        auctionMapper.update(auction) == 1
+        def resultAuction = auctionMapper.getAuction(auction.getId())
+        def counterparty = resultAuction.getCounterparty()
+        counterparty != null
+        counterparty.getId() == 1L
     }
 
 }

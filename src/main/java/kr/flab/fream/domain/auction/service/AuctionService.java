@@ -1,6 +1,7 @@
 package kr.flab.fream.domain.auction.service;
 
 import kr.flab.fream.controller.auction.AuctionRequest;
+import kr.flab.fream.controller.user.UserDto;
 import kr.flab.fream.domain.auction.model.Auction;
 import kr.flab.fream.domain.product.model.Product;
 import kr.flab.fream.domain.product.model.Size;
@@ -8,6 +9,7 @@ import kr.flab.fream.domain.product.service.ProductService;
 import kr.flab.fream.domain.user.model.User;
 import kr.flab.fream.domain.user.service.UserService;
 import kr.flab.fream.mybatis.mapper.auction.AuctionMapper;
+import kr.flab.fream.mybatis.mapper.user.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuctionService {
 
     private final AuctionMapper auctionMapper;
-    private final UserService userService;
+    private final UserMapper userMapper;
     private final ProductService productService;
 
     /**
@@ -37,7 +39,7 @@ public class AuctionService {
 
         Product product = productService.getProduct(request.getProductId());
         Size size = product.getSize(request.getSizeId());
-        User user = userService.getUser(request.getUserId());
+        User user = userMapper.getUser(request.getUserId());
 
         auction.setProduct(product);
         auction.setSize(size);

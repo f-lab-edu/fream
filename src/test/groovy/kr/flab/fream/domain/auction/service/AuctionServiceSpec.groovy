@@ -8,6 +8,7 @@ import kr.flab.fream.domain.product.service.ProductService
 import kr.flab.fream.domain.user.model.User
 import kr.flab.fream.domain.user.service.UserService
 import kr.flab.fream.mybatis.mapper.auction.AuctionMapper
+import kr.flab.fream.mybatis.mapper.user.UserMapper
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -22,7 +23,7 @@ class AuctionServiceSpec extends Specification {
     AuctionMapper auctionMapper = Mock()
 
     @SpringBean
-    UserService userService = Stub() {
+    UserMapper userMapper = Stub() {
         getUser(_ as Long) >> { Long id -> new User(id) }
     }
 

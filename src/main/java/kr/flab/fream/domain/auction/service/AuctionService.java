@@ -8,8 +8,8 @@ import kr.flab.fream.domain.product.model.Product;
 import kr.flab.fream.domain.product.model.Size;
 import kr.flab.fream.domain.product.service.ProductService;
 import kr.flab.fream.domain.user.model.User;
-import kr.flab.fream.domain.user.service.UserService;
 import kr.flab.fream.mybatis.mapper.auction.AuctionMapper;
+import kr.flab.fream.mybatis.mapper.user.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -26,9 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuctionService {
 
     private final AuctionMapper auctionMapper;
-    private final UserService userService;
     private final ProductService productService;
     private final ModelMapper modelMapper;
+    private final UserMapper userMapper;
 
     /**
      * 구매 입찰을 생성한다.
@@ -41,7 +41,7 @@ public class AuctionService {
 
         Product product = productService.getProduct(request.getProductId());
         Size size = product.getSize(request.getSizeId());
-        User user = userService.getUser(request.getUserId());
+        User user = userMapper.getUser(request.getUserId());
 
         auction.setProduct(product);
         auction.setSize(size);
@@ -77,6 +77,25 @@ public class AuctionService {
         Auction auction = auctionMapper.getAuction(auctionId);
         auction.cancel();
 
+        auctionMapper.update(auction);
+    }
+
+    /**
+     * 입찰을 체겷한다.
+     *
+     * @param counterparty 낙찰받은 유저
+     * @param auctionId    입찰 ID
+     */
+    public void sign(User counterparty, Long auctionId) {
+        // TODO: 로그인 처리가 완성되면 더미 유저가 아닌 진짜 유저를 받도록 수정
+        User user = new User();
+        user.setPassword("password");
+        user.setName("dummyUser");
+        user.setAccount("account");
+        userMapper.joinUser(user);
+
+        Auction auction = auctionMapper.getAuctionForUpdate(auctionId);
+        auction.sign(user);
         auctionMapper.update(auction);
     }
 

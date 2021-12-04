@@ -59,4 +59,12 @@ public class AuctionController {
         service.cancel(id);
     }
 
+    @PatchMapping(value = {"/asks/{id}/counterparty", "/bids/{id}/counterparty"})
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void signAuction(
+            @Valid @PathVariable @NotNull Long id) {
+        // TODO: 로그인 구현되면 로그인한 유저를 전달
+        service.sign(null, id);
+    }
+
 }

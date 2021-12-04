@@ -7,6 +7,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
+import static kr.flab.user.UserFixtures.fream
+import static kr.flab.user.UserFixtures.tester
+
 class AuctionTest extends Specification {
 
     def static nextDay() {
@@ -15,6 +18,7 @@ class AuctionTest extends Specification {
 
     def static activeAuction() {
         def auction = new Ask(1L, new BigDecimal("100000"), LocalDateTime.now(), nextDay(), null, null, AuctionType.ASK)
+        auction.setUser(tester())
         assert auction.state.getClass() == Active
 
         return auction
@@ -23,6 +27,7 @@ class AuctionTest extends Specification {
     def static inactiveAuction() {
         def baseDate = LocalDateTime.of(LocalDate.of(2000, 1, 1), LocalTime.MIDNIGHT)
         def auction = new Ask(1L, new BigDecimal("100000"), baseDate, baseDate, null, null, AuctionType.ASK)
+        auction.setUser(tester())
         assert auction.state.getClass() == Inactive
 
         return auction
@@ -30,6 +35,7 @@ class AuctionTest extends Specification {
 
     def static finishedAuction() {
         def auction = new Ask(1L, new BigDecimal("100000"), LocalDateTime.now(), nextDay(), null, LocalDateTime.now(), AuctionType.ASK)
+        auction.setUser(tester())
         assert auction.state.getClass() == Finished
 
         return auction
@@ -37,6 +43,7 @@ class AuctionTest extends Specification {
 
     def static canceledAuction() {
         def auction = new Ask(1L, new BigDecimal("100000"), LocalDateTime.now(), nextDay(), LocalDateTime.now(), null, AuctionType.ASK)
+        auction.setUser(tester())
         assert auction.state.getClass() == Canceled
 
         return auction
@@ -62,8 +69,22 @@ class AuctionTest extends Specification {
         def auction = activeAuction()
 
         expect:
-        auction.sign()
+        auction.sign(fream())
+
+        auction.signedAt != null
+        auction.getCounterparty() != null
         auction.state.getClass() == Finished
+    }
+
+    def "cannot sign to the auction that made yourself"() {
+        given:
+        def auction = activeAuction()
+
+        when:
+        auction.sign(tester())
+
+        then:
+        thrown(IllegalArgumentException)
     }
 
     def "cancel the active auction"() {
@@ -104,7 +125,7 @@ class AuctionTest extends Specification {
         def auction = inactiveAuction()
 
         when:
-        auction.sign()
+        auction.sign(fream())
 
         then:
         thrown(IllegalStateException)
@@ -126,7 +147,7 @@ class AuctionTest extends Specification {
         def auction = finishedAuction()
 
         when:
-        auction.sign()
+        auction.sign(fream())
 
         then:
         thrown(IllegalStateException)
@@ -159,7 +180,7 @@ class AuctionTest extends Specification {
         def auction = canceledAuction()
 
         when:
-        auction.sign()
+        auction.sign(fream())
 
         then:
         thrown(IllegalStateException)

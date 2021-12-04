@@ -12,4 +12,8 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
     use-generated-keys: true
-
+    lazy-loading-enabled: true
+    aggressive-lazy-loading: false
+logging:
+  level:
+    root: DEBUG

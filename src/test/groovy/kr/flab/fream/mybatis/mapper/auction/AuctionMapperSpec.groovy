@@ -60,6 +60,7 @@ class AuctionMapperSpec extends DatabaseTest {
         given:
         def product = getNikeDunkLowRetroBlack()
         def auction = AuctionFixtures.create("284000", product, product.getSize(1L), 60, AuctionType.BID)
+
         auctionMapper.create(auction)
 
         def user = new User()
@@ -73,6 +74,20 @@ class AuctionMapperSpec extends DatabaseTest {
         def counterparty = resultAuction.getCounterparty()
         counterparty != null
         counterparty.getId() == 1L
+    }
+
+    def "get auction using x lock"() {
+        given:
+        def product = getNikeDunkLowRetroBlack()
+        def auction = AuctionFixtures.create("284000", product, product.getSize(1L), 60, AuctionType.BID)
+
+        auctionMapper.create(auction)
+
+        when:
+        def auctionWithXLock = auctionMapper.getAuctionForUpdate(auction.getId())
+
+        then:
+        auctionWithXLock.getId() == auction.getId()
     }
 
 }

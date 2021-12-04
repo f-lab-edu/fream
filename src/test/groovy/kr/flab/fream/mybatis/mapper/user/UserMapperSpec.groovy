@@ -2,21 +2,19 @@ package kr.flab.fream.mybatis.mapper.user
 
 import kr.flab.fream.DatabaseTest
 import kr.flab.fream.domain.user.model.User
-import kr.flab.fream.mybatis.mapper.product.ProductMapper
+import kr.flab.fream.domain.user.service.UserService
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import spock.lang.Specification
 
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserMapperSpec extends DatabaseTest {
 
     @Autowired
-    UserMapper userMapper;
-    @Autowired
     AddressMapper addressMapper;
-
+    @Autowired
+    UserMapper userMapper;
     def "update user"() {
         given:
         def user = new User();
@@ -44,10 +42,6 @@ class UserMapperSpec extends DatabaseTest {
         userMapper.joinUser(user) == 1
     }
     def "get user"() {
-        given:
-        def user = new User();
-        user.setId(1L);
-
         expect:
         userMapper.getUser(1L).getAddressBook().size()==3
     }

@@ -19,8 +19,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final ModelMapper modelMapper;
 
-    public User getUser(Long id) {
-        //return modelMapper.map(userMapper.getUser(id), UserDto.class);
-        return userMapper.getUser(id);
+    public UserDto getUser(Long id) {
+        return modelMapper.map(userMapper.getUser(id), UserDto.class);
     }
 }

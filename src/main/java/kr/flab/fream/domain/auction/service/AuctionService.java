@@ -3,6 +3,7 @@ package kr.flab.fream.domain.auction.service;
 import kr.flab.fream.controller.auction.AuctionDto;
 import kr.flab.fream.controller.auction.AuctionPatchRequest;
 import kr.flab.fream.controller.auction.AuctionRequest;
+import kr.flab.fream.controller.user.UserDto;
 import kr.flab.fream.domain.auction.model.Auction;
 import kr.flab.fream.domain.product.model.Product;
 import kr.flab.fream.domain.product.model.Size;
@@ -26,9 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuctionService {
 
     private final AuctionMapper auctionMapper;
+    private final UserMapper userMapper;
     private final ProductService productService;
     private final ModelMapper modelMapper;
-    private final UserMapper userMapper;
 
     /**
      * 구매 입찰을 생성한다.

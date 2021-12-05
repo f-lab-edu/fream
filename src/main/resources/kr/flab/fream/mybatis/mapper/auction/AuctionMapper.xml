@@ -8,8 +8,8 @@
         <constructor>
             <idArg column="id" javaType="long"/>
             <arg column="price" javaType="java.math.BigDecimal"/>
-            <arg column="due_date" javaType="java.time.LocalDateTime"/>
             <arg column="created_at" javaType="java.time.LocalDateTime"/>
+            <arg column="due_date" javaType="java.time.LocalDateTime"/>
             <arg column="canceled_at" javaType="java.time.LocalDateTime"/>
             <arg column="signed_at" javaType="java.time.LocalDateTime"/>
             <arg column="type" javaType="kr.flab.fream.domain.auction.model.AuctionType"/>
@@ -67,7 +67,7 @@
                A.signed_at   AS signed_at,
                A.product_id  AS product_id,
                A.size_id     AS size_id,
-               A.id          AS user_id,
+               A.user_id     AS user_id,
                A.type        AS type
         FROM auction AS A
         WHERE A.id = #{id}

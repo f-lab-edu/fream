@@ -1,5 +1,6 @@
 package kr.flab.fream.controller.auction;
 
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import kr.flab.fream.controller.product.ProductDto;
@@ -11,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import org.modelmapper.TypeToken;
 
 /**
  * {@link kr.flab.fream.domain.auction.model.Ask}와 {@link kr.flab.fream.domain.auction.model.Bid}의
@@ -26,11 +28,18 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode
 public class AuctionDto {
 
+    private static final Type TYPE_OBJECT = new TypeToken<AuctionDto>() {
+    }.getType();
+
     Long id;
     BigDecimal price;
     LocalDateTime dueDate;
     ProductDto product;
     String sizeName;
     AuctionType type;
+
+    public static Type getTypeObject() {
+        return TYPE_OBJECT;
+    }
 
 }

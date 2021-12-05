@@ -4,10 +4,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.function.Predicate;
 import kr.flab.fream.controller.auction.AuctionRequest;
 import kr.flab.fream.domain.product.model.Product;
 import kr.flab.fream.domain.product.model.Size;
 import kr.flab.fream.domain.user.model.User;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +20,6 @@ import lombok.Setter;
  * @since 1.0.0
  */
 @NoArgsConstructor
-//@AllArgsConstructor
 @Getter
 public class Auction {
 
@@ -39,6 +40,9 @@ public class Auction {
     @Setter
     private User user;
 
+    @Setter
+    private AuctionState state;
+
     protected Auction(Long id, BigDecimal price, LocalDateTime createdAt, LocalDateTime dueDate,
             LocalDateTime canceledAt, LocalDateTime signedAt, AuctionType type) {
         this.id = id;
@@ -48,12 +52,14 @@ public class Auction {
         this.canceledAt = canceledAt;
         this.signedAt = signedAt;
         this.type = type;
+        this.state = AuctionStateFactory.createState(this);
     }
 
     protected Auction(AuctionRequest auctionRequest, AuctionType type) {
         this.price = auctionRequest.getPrice();
         this.type = type;
         setDueDate(auctionRequest.getDueDays());
+        this.state = AuctionStateFactory.createState(this);
     }
 
     private void setDueDate(long dueDays) {
@@ -61,8 +67,56 @@ public class Auction {
                 LocalTime.MIDNIGHT);
     }
 
-    public void setDueDaysFromToday(long dueDays) {
+    /**
+     * 입찰 내용을 변경한다.
+     *
+     * @param price   새로 적용할 가격
+     * @param dueDays 입찰 만료일
+     */
+    public void update(BigDecimal price, long dueDays) {
+        state.update(this);
+
+        this.price = price;
         setDueDate(dueDays);
     }
+
+    /**
+     * 입찰 완료 처리한다.
+     */
+    public void sign() {
+        state.finish(this);
+
+        this.signedAt = LocalDateTime.now();
+    }
+
+    /**
+     * 입찰 취소 처리한다.
+     */
+    public void cancel() {
+        state.cancel(this);
+
+        this.canceledAt = LocalDateTime.now();
+    }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
+    private static final class AuctionStateFactory {
+
+        private static final Predicate<Auction> ACTIVE
+                = auction -> auction.dueDate.isAfter(LocalDateTime.now());
+
+        public static AuctionState createState(Auction auction) {
+            if (auction.canceledAt != null) {
+                return new Canceled();
+            }
+
+            if (auction.signedAt != null) {
+                return new Finished();
+            }
+
+            return ACTIVE.test(auction) ? new Active() : new Inactive();
+        }
+
+    }
+
 
 }

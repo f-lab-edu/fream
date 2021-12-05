@@ -1,7 +1,8 @@
-package kr.flab.fream.domain.user.model;
+package kr.flab.fream.controller.user;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import kr.flab.fream.domain.user.model.Address;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -12,29 +13,27 @@ import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 /**
- * 사용자 클래스
- * 사용자들은 고유한 userId와 하나이상의 주소({@link Address})를 가진 주소록(List<Address></Address>)으로 구성된다.
+ {@link kr.flab.fream.domain.user.model.User} 도메인 클래스의 DTO.
+ *<P></P>
+ * 사용자 정보를 노출할때 사용한다.
+ *
+ * @since 1.0.0
  */
-
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-@Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class User {
+@Setter
+public class UserDto {
     Long id;
     String password;
     String name;
     List<Address> addressBook;
+    String email;
     String phone;
     String account;
-    String email;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-
-    public User(Long id) {
-        this.id = id;
-    }
 }

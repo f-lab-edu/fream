@@ -1,5 +1,6 @@
 package kr.flab.fream.domain.user.model;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,4 +24,6 @@ public class Address {
     private String address;
     private String addressDetail;
     private Boolean isDefault;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

@@ -2,7 +2,9 @@ package kr.flab.fream.controller.auction;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import kr.flab.fream.auth.Authentication;
 import kr.flab.fream.domain.auction.service.AuctionService;
+import kr.flab.fream.domain.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -62,9 +64,9 @@ public class AuctionController {
     @PatchMapping(value = {"/asks/{id}/counterparty", "/bids/{id}/counterparty"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void signAuction(
+            @Valid @Authentication @NotNull User user,
             @Valid @PathVariable @NotNull Long id) {
-        // TODO: 로그인 구현되면 로그인한 유저를 전달
-        service.sign(null, id);
+        service.sign(user, id);
     }
 
 }

@@ -3,7 +3,6 @@ package kr.flab.fream.domain.auction.service;
 import kr.flab.fream.controller.auction.AuctionDto;
 import kr.flab.fream.controller.auction.AuctionPatchRequest;
 import kr.flab.fream.controller.auction.AuctionRequest;
-import kr.flab.fream.controller.user.UserDto;
 import kr.flab.fream.domain.auction.model.Auction;
 import kr.flab.fream.domain.product.model.Product;
 import kr.flab.fream.domain.product.model.Size;
@@ -88,15 +87,8 @@ public class AuctionService {
      * @param auctionId    입찰 ID
      */
     public void sign(User counterparty, Long auctionId) {
-        // TODO: 로그인 처리가 완성되면 더미 유저가 아닌 진짜 유저를 받도록 수정
-        User user = new User();
-        user.setPassword("password");
-        user.setName("dummyUser");
-        user.setAccount("account");
-        userMapper.joinUser(user);
-
         Auction auction = auctionMapper.getAuctionForUpdate(auctionId);
-        auction.sign(user);
+        auction.sign(counterparty);
         auctionMapper.update(auction);
     }
 

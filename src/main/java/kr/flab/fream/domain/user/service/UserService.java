@@ -22,4 +22,8 @@ public class UserService {
     public UserDto getUser(Long id) {
         return modelMapper.map(userMapper.getUser(id), UserDto.class);
     }
+
+    public void userLogin(UserDto userDto){
+
+    }
 }

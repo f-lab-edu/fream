@@ -21,7 +21,7 @@
         </collection>
     </resultMap>
 
-    <select id="getUser" parameterType="long" resultMap="userResultMap">
+    <select id="getUserById" parameterType="long" resultMap="userResultMap">
         SELECT u.id AS id,
                u.name AS name,
                u.password AS password,

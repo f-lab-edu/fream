@@ -6,6 +6,12 @@ import kr.flab.fream.domain.user.service.UserService
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
+import org.springframework.mock.web.MockHttpSession
+
+import javax.servlet.ServletContext
+import javax.servlet.http.HttpSession
+import javax.servlet.http.HttpSessionContext
+import java.net.http.HttpRequest
 
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -54,5 +60,17 @@ class UserMapperSpec extends DatabaseTest {
         addressMapper.deleteAddress(user.getAddressBook());
         expect:
         userMapper.deleteUser(user) == 1
+    }
+
+    def "login"(){
+        given:
+        def user = new User();
+        //HttpRequest req = new HttpRequest();
+        HttpSession session = new MockHttpSession();
+        def userInfo = userMapper.getUserById(1L);
+        session.setAttribute("userInfo",userInfo);
+
+        expect:
+        session.getAttribute("userInfo").equals(userInfo);
     }
 }

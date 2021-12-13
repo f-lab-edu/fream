@@ -43,7 +43,7 @@ public class AuctionService {
 
         Product product = productService.getProduct(request.getProductId());
         Size size = product.getSize(request.getSizeId());
-        User user = userMapper.getUser(request.getUserId());
+        User user = userMapper.getUserById(request.getUserId());
 
         auction.setProduct(product);
         auction.setSize(size);

@@ -4,6 +4,15 @@ spring:
     locations:
       - classpath:db/migration
       - classpath:db/migration-seed
+  datasource:
+    url: jdbc:mysql://localhost:3306/fream?useSSL=false&allowPublicKeyRetrieval=true
+    username: test
+    password: test
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: always
+      table-name: SPRING_SESSION
 mybatis:
   configuration:
     map-underscore-to-camel-case: true

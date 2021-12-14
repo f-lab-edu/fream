@@ -2,10 +2,10 @@ package kr.flab.fream.auth
 
 import kr.flab.fream.config.WebConfig
 import kr.flab.fream.domain.user.model.User
-import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.Primary
 import org.springframework.core.MethodParameter
 import org.springframework.http.HttpStatus
 import org.springframework.lang.Nullable
@@ -32,9 +32,6 @@ class AuthenticationResolverTest extends Specification {
     @Autowired
     MockMvc mockMvc
 
-    @SpringBean
-    AuthenticationInterceptor interceptor = Stub()
-
     def "resolve an authentication"() {
         given:
         def resultActions = mockMvc.perform(post("/authTest"))
@@ -59,6 +56,7 @@ class AuthenticationResolverTest extends Specification {
     }
 
     @Component
+    @Primary
     private static class TestAuthenticationResolver extends AbstractAuthenticationResolver {
 
         @Override

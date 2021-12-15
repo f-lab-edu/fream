@@ -12,6 +12,7 @@ import kr.flab.fream.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -32,8 +33,8 @@ public class UserController {
 
         UserDto userDto = new UserDto("hpotter300@naver.com","12345678");
         Boolean resultCd = false;
-        if(userService.userLogin(userDto)){
-            session.setAttribute("userInfo",userService.getUserById(1L));
+        if(!ObjectUtils.isEmpty(userService.userLogin(userDto))){
+            session.setAttribute("userInfo",userService.userLogin(userDto));
             resultCd = true;
         }
         return resultCd;

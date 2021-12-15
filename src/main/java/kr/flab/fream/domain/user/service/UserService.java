@@ -29,10 +29,10 @@ public class UserService {
      *
      * @param userDto
      */
-    public Boolean userLogin(UserDto userDto){
+    public UserDto userLogin(UserDto userDto){
         if(!ObjectUtils.isEmpty(userMapper.getUser(userDto))){
-            return true;
+            return modelMapper.map(userMapper.getUser(userDto), UserDto.class);
         }
-        return false;
+        return null;
     }
 }

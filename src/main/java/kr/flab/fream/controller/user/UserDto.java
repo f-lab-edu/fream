@@ -1,15 +1,10 @@
 package kr.flab.fream.controller.user;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import kr.flab.fream.domain.user.model.Address;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 /**
@@ -26,7 +21,7 @@ import lombok.experimental.FieldDefaults;
 @ToString
 @EqualsAndHashCode
 @Setter
-public class UserDto {
+public class UserDto implements Serializable {
     Long id;
     String password;
     String name;
@@ -36,4 +31,14 @@ public class UserDto {
     String account;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
+
+    /**
+     * 로그인시 이용되는 UserDto
+     * @param email
+     * @param password
+     */
+    public UserDto(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
 }

@@ -12,10 +12,7 @@ import kr.flab.fream.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Product 컨트롤러.
@@ -30,11 +27,16 @@ public class UserController {
     private final UserService userService;
     private final ModelMapper modelMapper;
 
+    @RequestMapping(value = "/login")
+    public Boolean login(HttpSession session){
 
-    @GetMapping(value = "/login")
-    public UserDto login(HttpSession session){
-        session.setAttribute("userInfo",userService.getUserById(1L));
-        return (UserDto)session.getAttribute("userInfo");
+        UserDto userDto = new UserDto("hpotter300@naver.com","12345678");
+        Boolean resultCd = false;
+        if(userService.userLogin(userDto)){
+            session.setAttribute("userInfo",userService.getUserById(1L));
+            resultCd = true;
+        }
+        return resultCd;
     }
 
 }

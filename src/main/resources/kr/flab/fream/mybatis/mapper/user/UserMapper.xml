@@ -38,6 +38,24 @@
         WHERE u.id = #{id}
     </select>
 
+    <select id="getUser" parameterType="kr.flab.fream.controller.user.UserDto" resultMap="userResultMap">
+        SELECT u.id AS id,
+               u.name AS name,
+               u.password AS password,
+               u.email AS email,
+               u.phone AS phone,
+               u.account AS account,
+               a.id AS address_id,
+               a.address AS address,
+               a.address_detail AS address_detail,
+               a.is_default AS is_default,
+               a.alias AS alias
+        FROM  user AS u
+                  JOIN address AS a ON u.id = a.user_id
+        WHERE u.email = #{id}
+            And u.password = #{password}
+    </select>
+
     <insert id="joinUser"  keyProperty="id"   parameterType="kr.flab.fream.domain.user.model.User"   useGeneratedKeys="true">
         INSERT INTO user (password, name, email, phone,
                            account)

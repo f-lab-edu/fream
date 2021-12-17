@@ -3,6 +3,7 @@ package kr.flab.fream.controller.auction;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import kr.flab.fream.auth.Authentication;
+import kr.flab.fream.domain.auction.dto.SignAuctionResponse;
 import kr.flab.fream.domain.auction.service.AuctionService;
 import kr.flab.fream.domain.user.model.User;
 import lombok.RequiredArgsConstructor;
@@ -61,12 +62,11 @@ public class AuctionController {
         service.cancel(id);
     }
 
-    @PatchMapping(value = {"/asks/{id}/counterparty", "/bids/{id}/counterparty"})
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void signAuction(
+    @PostMapping(value = {"/asks/{id}/sign", "/bids/{id}/sign"})
+    public SignAuctionResponse signAuction(
             @Valid @Authentication @NotNull User user,
             @Valid @PathVariable @NotNull Long id) {
-        service.sign(user, id);
+        return service.sign(user, id);
     }
 
 }

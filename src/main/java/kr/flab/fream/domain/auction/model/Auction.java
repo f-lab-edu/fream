@@ -41,7 +41,7 @@ public class Auction {
     @Setter
     private User user;
 
-    private User counterparty;
+    private User bidder;
 
     @Setter
     private AuctionState state;
@@ -86,14 +86,14 @@ public class Auction {
     /**
      * 입찰 완료 처리한다.
      */
-    public void sign(User counterparty) {
-        if (Objects.equals(this.user.getId(), counterparty.getId())) {
+    public void sign(User bidder) {
+        if (Objects.equals(this.user.getId(), bidder.getId())) {
             throw new IllegalArgumentException("직접 등록한 입찰에 참여할 수 없습니다.");
         }
         state.finish(this);
 
         this.signedAt = LocalDateTime.now();
-        this.counterparty = counterparty;
+        this.bidder = bidder;
     }
 
     /**

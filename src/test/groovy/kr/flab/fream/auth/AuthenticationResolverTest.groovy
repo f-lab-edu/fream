@@ -2,21 +2,14 @@ package kr.flab.fream.auth
 
 import kr.flab.fream.config.WebConfig
 import kr.flab.fream.domain.user.model.User
-import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
-import org.springframework.core.MethodParameter
 import org.springframework.http.HttpStatus
-import org.springframework.lang.Nullable
-import org.springframework.stereotype.Component
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.bind.support.WebDataBinderFactory
-import org.springframework.web.context.request.NativeWebRequest
-import org.springframework.web.method.support.ModelAndViewContainer
 import spock.lang.Specification
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -31,9 +24,6 @@ class AuthenticationResolverTest extends Specification {
 
     @Autowired
     MockMvc mockMvc
-
-    @SpringBean
-    AuthenticationInterceptor interceptor = Stub()
 
     def "resolve an authentication"() {
         given:
@@ -54,21 +44,6 @@ class AuthenticationResolverTest extends Specification {
         @PostMapping
         TestDto post(@Authentication User user) {
             return new TestDto(user.getId())
-        }
-
-    }
-
-    @Component
-    private static class TestAuthenticationResolver extends AbstractAuthenticationResolver {
-
-        @Override
-        Object resolveArgument(MethodParameter parameter,
-                               @Nullable ModelAndViewContainer mavContainer,
-                               NativeWebRequest webRequest,
-                               @Nullable WebDataBinderFactory binderFactory) throws Exception {
-            User user = new User()
-            user.id = userId
-            return user
         }
 
     }

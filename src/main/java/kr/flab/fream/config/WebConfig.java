@@ -2,7 +2,6 @@ package kr.flab.fream.config;
 
 import java.util.List;
 import kr.flab.fream.auth.AbstractAuthenticationResolver;
-import kr.flab.fream.auth.AuthenticationInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -13,7 +12,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    private final AuthenticationInterceptor authenticationInterceptor;
     private final AbstractAuthenticationResolver authenticationResolver;
 
     @Override

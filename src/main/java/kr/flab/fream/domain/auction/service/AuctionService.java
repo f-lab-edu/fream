@@ -7,6 +7,7 @@ import kr.flab.fream.controller.auction.AuctionDto;
 import kr.flab.fream.controller.auction.AuctionPatchRequest;
 import kr.flab.fream.controller.auction.AuctionRequest;
 import kr.flab.fream.controller.auction.AuctionSummaryByPriceAndSizeWithQuantity;
+import kr.flab.fream.domain.auction.dto.SignAuctionResponse;
 import kr.flab.fream.domain.auction.model.Auction;
 import kr.flab.fream.domain.auction.model.AuctionType;
 import kr.flab.fream.domain.product.model.Product;
@@ -100,15 +101,17 @@ public class AuctionService {
     }
 
     /**
-     * 입찰을 체겷한다.
+     * 입찰을 체결한다.
      *
-     * @param counterparty 낙찰받은 유저
-     * @param auctionId    입찰 ID
+     * @param bidder    낙찰받은 유저
+     * @param auctionId 입찰 ID
      */
-    public void sign(User counterparty, Long auctionId) {
+    public SignAuctionResponse sign(User bidder, Long auctionId) {
         Auction auction = auctionMapper.getAuctionForUpdate(auctionId);
-        auction.sign(counterparty);
+        auction.sign(bidder);
         auctionMapper.update(auction);
+
+        return modelMapper.map(auction, SignAuctionResponse.getTypeObject());
     }
 
     private AuctionDto convert(Auction auction) {

@@ -27,9 +27,9 @@
             fetchType="lazy"
             column="user_id"
             select="kr.flab.fream.mybatis.mapper.user.UserMapper.getUser"/>
-        <association property="counterparty" javaType="kr.flab.fream.domain.user.model.User"
+        <association property="bidder" javaType="kr.flab.fream.domain.user.model.User"
             fetchType="lazy"
-            column="counterparty_id"
+            column="bidder_id"
             select="kr.flab.fream.mybatis.mapper.user.UserMapper.getUser"/>
         <discriminator javaType="kr.flab.fream.domain.auction.model.AuctionType" column="type">
             <case value="ASK" resultType="kr.flab.fream.domain.auction.model.Ask"/>
@@ -55,42 +55,42 @@
 
     <update id="update" parameterType="kr.flab.fream.domain.auction.model.Auction">
         UPDATE auction
-        SET price           = #{price},
-            due_date        = #{dueDate},
-            signed_at       = #{signedAt},
-            canceled_at     = #{canceledAt},
-            counterparty_id = #{counterparty.id}
+        SET price       = #{price},
+            due_date    = #{dueDate},
+            signed_at   = #{signedAt},
+            canceled_at = #{canceledAt},
+            bidder_id   = #{bidder.id}
         WHERE id = #{id}
     </update>
 
     <select id="getAuction" parameterType="long" resultMap="auctionResultMap">
-        SELECT A.id              AS id,
-               A.price           AS price,
-               A.created_at      AS created_at,
-               A.due_date        AS due_date,
-               A.canceled_at     AS canceled_at,
-               A.signed_at       AS signed_at,
-               A.product_id      AS product_id,
-               A.size_id         AS size_id,
-               A.user_id         AS user_id,
-               A.counterparty_id AS counterparty_id,
-               A.type            AS type
+        SELECT A.id          AS id,
+               A.price       AS price,
+               A.created_at  AS created_at,
+               A.due_date    AS due_date,
+               A.canceled_at AS canceled_at,
+               A.signed_at   AS signed_at,
+               A.product_id  AS product_id,
+               A.size_id     AS size_id,
+               A.user_id     AS user_id,
+               A.bidder_id   AS bidder_id,
+               A.type        AS type
         FROM auction AS A
         WHERE A.id = #{id}
     </select>
 
     <select id="getAuctionForUpdate" parameterType="long" resultMap="auctionResultMap">
-        SELECT A.id              AS id,
-               A.price           AS price,
-               A.created_at      AS created_at,
-               A.due_date        AS due_date,
-               A.canceled_at     AS canceled_at,
-               A.signed_at       AS signed_at,
-               A.product_id      AS product_id,
-               A.size_id         AS size_id,
-               A.user_id         AS user_id,
-               A.counterparty_id AS counterparty_id,
-               A.type            AS type
+        SELECT A.id          AS id,
+               A.price       AS price,
+               A.created_at  AS created_at,
+               A.due_date    AS due_date,
+               A.canceled_at AS canceled_at,
+               A.signed_at   AS signed_at,
+               A.product_id  AS product_id,
+               A.size_id     AS size_id,
+               A.user_id     AS user_id,
+               A.bidder_id   AS bidder_id,
+               A.type        AS type
         FROM auction AS A
         WHERE A.id = #{id}
             FOR

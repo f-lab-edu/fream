@@ -3,9 +3,12 @@ package kr.flab.fream.controller.auction
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import kr.flab.domain.product.ProductFixtures
+import kr.flab.fream.auth.AbstractAuthenticationResolver
 import kr.flab.fream.config.FormattingConfiguration
 import kr.flab.fream.config.ModelMapperConfiguration
+import kr.flab.fream.config.WebConfig
 import kr.flab.fream.controller.product.ProductDto
+import kr.flab.fream.domain.auction.dto.SignAuctionResponse
 import kr.flab.fream.domain.auction.model.AuctionType
 import kr.flab.fream.domain.auction.service.AuctionService
 import kr.flab.fream.domain.user.model.User
@@ -14,10 +17,14 @@ import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
+import org.springframework.core.MethodParameter
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.web.bind.support.WebDataBinderFactory
+import org.springframework.web.context.request.NativeWebRequest
+import org.springframework.web.method.support.ModelAndViewContainer
 import spock.lang.Specification
 
 import java.nio.charset.Charset
@@ -29,7 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(AuctionController)
-@Import([ObjectMapper, ModelMapperConfiguration, FormattingConfiguration])
+@Import([ObjectMapper, ModelMapperConfiguration, FormattingConfiguration, WebConfig])
 class AuctionControllerSpec extends Specification {
 
     static final String ASK_URL = "/auction/asks"
@@ -45,6 +52,9 @@ class AuctionControllerSpec extends Specification {
 
     @SpringBean
     AuctionService auctionService = Stub()
+
+    @SpringBean(name = "temporaryAuthenticationResolver")
+    AbstractAuthenticationResolver authenticationResolver = Stub()
 
     @SuppressWarnings("unused")
     // IntelliJ 가 spock setup 을 인식하지 못함
@@ -152,4 +162,47 @@ class AuctionControllerSpec extends Specification {
         ].combinations()
     }
 
+    def "return 401 if there is no authentication when signing to the auction"() {
+        given:
+        String targetUrl = url + "/1/sign"
+
+        def builder = post(targetUrl)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+
+        authenticationResolver.resolveArgument(_ as MethodParameter, _ as ModelAndViewContainer,
+            _ as NativeWebRequest, _ as WebDataBinderFactory) >> null
+
+        when:
+        def resultActions = mockMvc.perform(builder)
+
+        then:
+        resultActions.andExpect(status().is(HttpStatus.UNAUTHORIZED.value()))
+
+        where:
+        url << ["/auction/asks", "/auction/bids"]
+    }
+
+    def "return 200 when signing to the auction"() {
+        given:
+        String targetUrl = url + "/1/sign"
+
+        def builder = post(targetUrl)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+
+        authenticationResolver.resolveArgument(_ as MethodParameter, _ as ModelAndViewContainer,
+            _ as NativeWebRequest, _ as WebDataBinderFactory) >> Stub(User)
+
+        auctionService.sign(_ as User, 1L) >> new SignAuctionResponse(1L, LocalDateTime.now())
+
+        when:
+        def resultActions = mockMvc.perform(builder)
+
+        then:
+        resultActions.andExpect(status().is(HttpStatus.OK.value()))
+
+        where:
+        url << ["/auction/asks", "/auction/bids"]
+    }
 }

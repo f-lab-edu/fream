@@ -62,7 +62,7 @@ class AuctionMapperSpec extends DatabaseTest {
         auctionMapper.update(auction) == 1
     }
 
-    def "set counterparty"() {
+    def "set bidder"() {
         given:
         def product = getNikeDunkLowRetroBlack()
         def auction = AuctionFixtures.create("284000", product, product.getSize(1L), 60, AuctionType.BID)
@@ -77,9 +77,9 @@ class AuctionMapperSpec extends DatabaseTest {
         expect:
         auctionMapper.update(auction) == 1
         def resultAuction = auctionMapper.getAuction(auction.getId())
-        def counterparty = resultAuction.getCounterparty()
-        counterparty != null
-        counterparty.getId() == 1L
+        def bidder = resultAuction.getBidder()
+        bidder != null
+        bidder.getId() == 1L
     }
 
     def "get auction using x lock"() {

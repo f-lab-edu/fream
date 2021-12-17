@@ -72,7 +72,7 @@ class AuctionTest extends Specification {
         auction.sign(fream())
 
         auction.signedAt != null
-        auction.getCounterparty() != null
+        auction.getBidder() != null
         auction.state.getClass() == Finished
     }
 

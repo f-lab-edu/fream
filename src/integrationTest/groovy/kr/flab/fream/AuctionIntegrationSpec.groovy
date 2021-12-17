@@ -2,6 +2,11 @@ package kr.flab.fream
 
 import io.restassured.http.ContentType
 import kr.flab.fream.domain.auction.model.AuctionType
+import kr.flab.fream.mybatis.mapper.auction.AuctionMapper
+import kr.flab.fream.mybatis.mapper.product.ProductMapper
+import kr.flab.fream.mybatis.mapper.user.AddressMapper
+import kr.flab.fream.mybatis.mapper.user.UserMapper
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.http.HttpStatus
 
@@ -12,6 +17,18 @@ class AuctionIntegrationSpec extends BaseIntegrationSpec {
 
     @LocalServerPort
     int port
+
+    @Autowired
+    ProductMapper productMapper
+
+    @Autowired
+    UserMapper userMapper
+
+    @Autowired
+    AuctionMapper auctionMapper
+
+    @Autowired
+    AddressMapper addressMapper
 
     def "create #type"() {
         given:

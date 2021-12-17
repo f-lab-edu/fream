@@ -6,6 +6,7 @@ import kr.flab.fream.auth.Authentication;
 import kr.flab.fream.domain.auction.dto.SignAuctionResponse;
 import kr.flab.fream.domain.auction.service.AuctionService;
 import kr.flab.fream.domain.user.model.User;
+import kr.flab.fream.mybatis.util.exception.NoAuthenticationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -55,6 +56,11 @@ public class AuctionController {
         return service.update(id, request);
     }
 
+    /**
+     * 등록한 입찰을 취소한다.
+     *
+     * @param id 입찰 ID
+     */
     @DeleteMapping(value = {"/asks/{id}", "/bids/{id}"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancelAuction(
@@ -62,10 +68,21 @@ public class AuctionController {
         service.cancel(id);
     }
 
+    /**
+     * 등록된 구매 또는 판매 입찰을 유저에게 낙찰한다.
+     *
+     * @param user 낙찰받은 유저
+     * @param id   입찰 ID
+     * @return 입찰 ID와 낙찰 시간을 반환
+     */
     @PostMapping(value = {"/asks/{id}/sign", "/bids/{id}/sign"})
     public SignAuctionResponse signAuction(
-            @Valid @Authentication @NotNull User user,
+            @Authentication User user,
             @Valid @PathVariable @NotNull Long id) {
+        if (user == null) {
+            throw new NoAuthenticationException();
+        }
+
         return service.sign(user, id);
     }
 

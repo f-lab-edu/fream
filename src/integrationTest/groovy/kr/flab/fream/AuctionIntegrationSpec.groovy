@@ -91,5 +91,22 @@ class AuctionIntegrationSpec extends BaseIntegrationSpec {
         response.getStatusCode() == HttpStatus.NO_CONTENT.value()
     }
 
+    def "get auction summaries"() {
+        given:
+        def request = given(this.spec)
+            .filter(document("auction/" + type + "/summaries"))
+            .log()
+            .all()
+
+        when:
+        def response = request.when().port(this.port).get("/auction/" + type + "/summaries?productId=1")
+
+        then:
+        response.getStatusCode() == HttpStatus.OK.value()
+
+        where:
+        type << ['asks', 'bids']
+    }
+
 }
 

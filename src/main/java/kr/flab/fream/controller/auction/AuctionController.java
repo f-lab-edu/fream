@@ -35,7 +35,7 @@ public class AuctionController {
 
     private final AuctionService service;
 
-    @GetMapping("/asks")
+    @GetMapping("/asks/summaries")
     public List<AuctionSummaryByPriceAndSizeWithQuantity> getAsks(
             @RequestParam @Valid @NotNull Long productId,
             @RequestParam(required = false) Long sizeId,
@@ -44,7 +44,7 @@ public class AuctionController {
         return service.getAuctionSummaries(AuctionType.ASK, productId, sizeId, lastPrice);
     }
 
-    @GetMapping("/bids")
+    @GetMapping("/bids/summaries")
     public List<AuctionSummaryByPriceAndSizeWithQuantity> getBids(
             @RequestParam @Valid @NotNull Long productId,
             @RequestParam(required = false) Long sizeId,

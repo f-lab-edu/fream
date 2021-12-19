@@ -35,6 +35,10 @@ public class UserController {
         @NotNull  @PathVariable String email
         ,@NotNull @PathVariable String password){
 
+        if(session.isNew()){
+            return (UserDto)session.getAttribute("userInfo");
+        }
+
         UserDto userDto = new UserDto(email,password);
         UserDto userInfo = userService.userLogin(userDto);
         if(!ObjectUtils.isEmpty(userInfo)){

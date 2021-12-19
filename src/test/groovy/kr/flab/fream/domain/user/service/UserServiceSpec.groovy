@@ -8,10 +8,13 @@ import org.modelmapper.ModelMapper
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.mock.web.MockHttpSession
 import spock.lang.Specification
 
+import javax.servlet.http.HttpSession
+
 class UserServiceSpec extends Specification {
-    def "get user"() {
+    def "get user By Id"() {
         given :
         def modelMapper = new ModelMapperConfiguration().modelMapper();
 
@@ -21,19 +24,19 @@ class UserServiceSpec extends Specification {
 
         def userService = new UserService(userMapper, modelMapper)
         expect:
-        userService.getUserById(1L).getId()==1
+        userService.getUserById(1L).getId()==1L;
     }
     def"user login"(){
         given :
         def modelMapper = new ModelMapperConfiguration().modelMapper();
 
         UserMapper userMapper = Stub() {
-            getUser(_ as UserDto) >> { String email,String password -> new UserDto(email,password) }
+            getUser(_ as UserDto) >> { UserDto userDto -> new User(userDto.getEmail(),userDto.getPassword())}
         }
-        def userDto = new UserDto("test@test.com","1234");
+        UserDto userDto = new UserDto("test@test.com","1234");
         def userService = new UserService(userMapper, modelMapper)
 
         expect:
-        userService.userLogin(userDto).getId()==1
+        userService.userLogin(userDto).getPassword()=="1234"
     }
 }

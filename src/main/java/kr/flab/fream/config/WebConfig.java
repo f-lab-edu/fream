@@ -1,9 +1,14 @@
 package kr.flab.fream.config;
 
+import java.util.Arrays;
 import java.util.List;
+import javax.validation.constraints.NotNull;
 import kr.flab.fream.auth.AbstractAuthenticationResolver;
+import kr.flab.fream.interceptor.LoginInterceptor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**

@@ -50,7 +50,7 @@ class UserMapperSpec extends DatabaseTest {
     }
     def "get user by id"() {
         expect:
-        userMapper.getUser(1L).getAddressBook().size()==3
+        userMapper.getUserById(1L).getAddressBook().size()==3
     }
 
     def "delete user"() {

@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.FieldDefaults;
 import org.modelmapper.TypeToken;
 
 /**
@@ -21,7 +20,6 @@ import org.modelmapper.TypeToken;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
@@ -30,8 +28,8 @@ public class SignAuctionResponse {
     private static final Type TYPE_OBJECT = new TypeToken<SignAuctionResponse>() {
     }.getType();
 
-    long id;
-    LocalDateTime signedAt;
+    private long id;
+    private LocalDateTime signedAt;
 
     public static Type getTypeObject() {
         return TYPE_OBJECT;

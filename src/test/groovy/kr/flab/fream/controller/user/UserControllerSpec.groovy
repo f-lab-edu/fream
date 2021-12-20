@@ -22,7 +22,7 @@ class UserControllerSpec extends Specification {
 
     def "로그인 성공"() {
         given:
-        def req = post("/user/test@test.com/1234");
+        def req = post("/user/test/test@test.com/1234");
 
         when:
         mockMvc.perform(req)
@@ -33,7 +33,7 @@ class UserControllerSpec extends Specification {
 
     def "when get is performed then the response has status 200 and content is 'Hello world!'"() {
         expect: "Status is 200 and the response is 'Hello world!'"
-        mockMvc.perform(post("/user/test@test.com/1234"))
+        mockMvc.perform(post("/user/login/test@test.com/1234"))
                 .andExpect(status().isOk())
                 .andReturn()
                 .response

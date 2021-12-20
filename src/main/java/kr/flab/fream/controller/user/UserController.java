@@ -50,6 +50,13 @@ public class UserController {
         return userInfo;
     }
 
+    /**
+     * 인터셉터 test용 api
+     * @param session
+     * @param email
+     * @param password
+     * @return
+     */
     @RequestMapping(value = "/test/{email}/{password}")
     public UserDto test(HttpSession session,
         @NotNull  @PathVariable String email

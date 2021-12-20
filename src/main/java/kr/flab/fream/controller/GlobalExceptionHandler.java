@@ -1,6 +1,7 @@
 package kr.flab.fream.controller;
 
 import java.time.LocalDateTime;
+import kr.flab.fream.mybatis.util.exception.NoAuthenticationException;
 import lombok.Builder;
 import lombok.Value;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * @return 발생한 예외에 대한 리포트 반환
      */
     @ExceptionHandler(value
-            = { IllegalArgumentException.class })
+            = {IllegalArgumentException.class})
     protected ResponseEntity<ErrorResponse> handleBadRequest(RuntimeException e) {
         final var errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
@@ -36,6 +37,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(NoAuthenticationException.class)
+    protected ResponseEntity<ErrorResponse> handleNoAuthentication(RuntimeException e) {
+        final var httpStatus = HttpStatus.UNAUTHORIZED;
+
+        final var errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(httpStatus.value())
+                .error(e.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, httpStatus);
+    }
+
     /**
      * 글로벌 예외가 발생할 때 사용할 DTO 객체.
      *
@@ -44,6 +58,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Value
     @Builder
     public static class ErrorResponse {
+
         LocalDateTime timestamp;
         Integer status;
         String error;

@@ -3,13 +3,12 @@ package kr.flab.fream.domain.auction.service;
 import kr.flab.fream.controller.auction.AuctionDto;
 import kr.flab.fream.controller.auction.AuctionPatchRequest;
 import kr.flab.fream.controller.auction.AuctionRequest;
-import kr.flab.fream.controller.user.UserDto;
+import kr.flab.fream.domain.auction.dto.SignAuctionResponse;
 import kr.flab.fream.domain.auction.model.Auction;
 import kr.flab.fream.domain.product.model.Product;
 import kr.flab.fream.domain.product.model.Size;
 import kr.flab.fream.domain.product.service.ProductService;
 import kr.flab.fream.domain.user.model.User;
-import kr.flab.fream.domain.user.service.UserService;
 import kr.flab.fream.mybatis.mapper.auction.AuctionMapper;
 import kr.flab.fream.mybatis.mapper.user.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -80,6 +79,20 @@ public class AuctionService {
         auction.cancel();
 
         auctionMapper.update(auction);
+    }
+
+    /**
+     * 입찰을 체결한다.
+     *
+     * @param bidder    낙찰받은 유저
+     * @param auctionId 입찰 ID
+     */
+    public SignAuctionResponse sign(User bidder, Long auctionId) {
+        Auction auction = auctionMapper.getAuctionForUpdate(auctionId);
+        auction.sign(bidder);
+        auctionMapper.update(auction);
+
+        return modelMapper.map(auction, SignAuctionResponse.getTypeObject());
     }
 
     private AuctionDto convert(Auction auction) {

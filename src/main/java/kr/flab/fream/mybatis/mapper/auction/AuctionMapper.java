@@ -19,4 +19,6 @@ public interface AuctionMapper {
 
     Auction getAuction(Long id);
 
+    Auction getAuctionForUpdate(Long id);
+
 }

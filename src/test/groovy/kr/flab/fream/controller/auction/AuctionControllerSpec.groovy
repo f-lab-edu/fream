@@ -32,6 +32,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -201,6 +202,24 @@ class AuctionControllerSpec extends Specification {
 
         then:
         resultActions.andExpect(status().is(HttpStatus.OK.value()))
+
+        where:
+        url << ["/auction/asks", "/auction/bids"]
+    }
+
+    def "return 400 if the product id not specified"() {
+        given:
+        String targetUrl = url + "/summaries"
+
+        def builder = get(targetUrl)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+
+        when:
+        def resultActions = mockMvc.perform(builder)
+
+        then:
+        resultActions.andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
 
         where:
         url << ["/auction/asks", "/auction/bids"]

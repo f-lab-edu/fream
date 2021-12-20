@@ -1,20 +1,25 @@
 package kr.flab.fream.controller.auction;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import kr.flab.fream.auth.Authentication;
 import kr.flab.fream.domain.auction.dto.SignAuctionResponse;
+import kr.flab.fream.domain.auction.model.AuctionType;
 import kr.flab.fream.domain.auction.service.AuctionService;
 import kr.flab.fream.domain.user.model.User;
 import kr.flab.fream.mybatis.util.exception.NoAuthenticationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,6 +34,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuctionController {
 
     private final AuctionService service;
+
+    @GetMapping("/asks/summaries")
+    public List<AuctionSummaryByPriceAndSizeWithQuantity> getAsks(
+            @RequestParam @Valid @NotNull Long productId,
+            @RequestParam(required = false) Long sizeId,
+            @RequestParam(required = false) BigDecimal lastPrice
+    ) {
+        return service.getAuctionSummaries(AuctionType.ASK, productId, sizeId, lastPrice);
+    }
+
+    @GetMapping("/bids/summaries")
+    public List<AuctionSummaryByPriceAndSizeWithQuantity> getBids(
+            @RequestParam @Valid @NotNull Long productId,
+            @RequestParam(required = false) Long sizeId,
+            @RequestParam(required = false) BigDecimal lastPrice
+    ) {
+        return service.getAuctionSummaries(AuctionType.BID, productId, sizeId, lastPrice);
+    }
 
     /**
      * 입찰 생성 API.

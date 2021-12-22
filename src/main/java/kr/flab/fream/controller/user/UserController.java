@@ -31,13 +31,13 @@ public class UserController {
 
     private final UserService userService;
     private final ModelMapper modelMapper;
-    private Logger logger = LoggerFactory.getLogger(getClass());
+   //private Logger logger = LoggerFactory.getLogger(getClass());
 
     @RequestMapping(value = "/login/{email}/{password}")
     public UserDto login(HttpSession session,
         @NotNull  @PathVariable String email
         ,@NotNull @PathVariable String password){
-        logger.debug("controller start");
+        //logger.debug("controller start");
         if(session.isNew()){
             return (UserDto)session.getAttribute("userInfo");
         }
@@ -64,5 +64,15 @@ public class UserController {
         UserDto userDto = new UserDto(email,password);
         return userDto;
     }
+
+    /**
+     * spock controller test 예제용
+     * @return
+     */
+    @GetMapping(value = "hello")
+    public String salutation() {
+        return "Hello world!";
+    }
+
 }
 

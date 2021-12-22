@@ -153,3 +153,4 @@ class AuctionControllerSpec extends Specification {
     }
 
 }
+

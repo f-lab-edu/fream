@@ -26,6 +26,6 @@ public class LoginInterceptor implements HandlerInterceptor {
         if(ObjectUtils.isEmpty(request.getSession().getAttribute("userInfo"))){
             return false;
         }
-        return false;
+        return true;
     }
 }

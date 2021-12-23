@@ -2,6 +2,7 @@ package kr.flab.fream.controller.user;
 
 import java.net.http.HttpRequest;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
 import kr.flab.fream.controller.product.ProductDto;
@@ -30,15 +31,13 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-    private final ModelMapper modelMapper;
+    //private final ModelMapper modelMapper;
    //private Logger logger = LoggerFactory.getLogger(getClass());
 
-    @RequestMapping(value = "/login/{email}/{password}")
+    @RequestMapping(value = "/login")
     public UserDto login(HttpSession session,
-        @NotNull  @PathVariable String email
-        ,@NotNull @PathVariable String password){
-
-        UserDto userDto = new UserDto(email,password);
+        @NotNull  @RequestBody UserDto loginInfo){
+        UserDto userDto = new UserDto(loginInfo.getEmail(),loginInfo.getPassword());
         UserDto userInfo = userService.userLogin(userDto);
         if(!ObjectUtils.isEmpty(userInfo)){
             session.setAttribute("userInfo",userInfo);
@@ -46,29 +45,26 @@ public class UserController {
         return userInfo;
     }
 
-    /**
-     * 인터셉터 test용 api
-     * @param session
-     * @param email
-     * @param password
-     * @return
-     */
-    @RequestMapping(value = "/test/{email}/{password}")
+    @RequestMapping(value = "/test")
     public UserDto test(HttpSession session,
-        @NotNull  @PathVariable String email
-        ,@NotNull @PathVariable String password){
-        UserDto userDto = new UserDto(email,password);
+        @NotNull  @RequestBody UserDto loginInfo){
+        UserDto userDto = new UserDto(loginInfo.getEmail(),loginInfo.getPassword());
+        //UserDto userInfo = userService.userLogin(userDto);
+        /*if(!ObjectUtils.isEmpty(userInfo)){
+            session.setAttribute("userInfo",userInfo);
+        }*/
         return userDto;
     }
 
     /**
-     * spock controller test 예제용
-     * @return
+     * 사용자 로그아웃
+     * @param session
      */
-    @GetMapping(value = "hello")
-    public String salutation() {
-        return "Hello world!";
+    @RequestMapping(value = "/logout")
+    public void logout(HttpSession session){
+        session.invalidate();
     }
+
 
 }
 

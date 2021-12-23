@@ -23,9 +23,10 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
         Object handler) throws Exception {
         logger.debug("intercepts");
+        System.out.println("interceptor");
         if(ObjectUtils.isEmpty(request.getSession().getAttribute("userInfo"))){
-            return false;
+            throw new Exception("not logined");
         }
-        return true;
+        return false;
     }
 }

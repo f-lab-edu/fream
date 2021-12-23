@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.mock.web.MockHttpSession
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
@@ -36,63 +37,56 @@ class UserControllerSpec extends Specification {
     @SpringBean
     UserService userService = Stub()
 
-    def "simple assertion test"() {
-        //givenultActions.andExpect(status().is(HttpStatus.OK.value()))
-        expect:
-        1 == 1
-    }
-
-    def "when get is performed then the response has status 200 and content is 'Hello world!'"() {
-
-        expect: "Status is 200 and the response is 'Hello world!'"
-        mockMvc.perform(get("/user/hello"))
-                .andExpect(status().isOk())
-                .andReturn()
-                .response
-                .contentAsString == "Hello world!"
-    }
-
-    def "when test is performed "() {
-        given:
-        userService.userLogin(_ as UserDto) >> { UserDto userDto -> new UserDto(userDto.getEmail(),userDto.getPassword())}
-        UserDto userDto = new UserDto("test","test");
-        System.out.println(userService.userLogin(userDto).toString())
-
-        expect: "Status is 200 and the response is 'Hello world!'"
-        mockMvc.perform(post("/user/test/test@test.com/1234"))
-                .andExpect(status().isOk())
-                .andReturn()
-                .response
-                .contentType == "application/json"
-    }
 
     def "login success"() {
         given:
         userService.userLogin(_ as UserDto) >> { UserDto userDto -> new UserDto(userDto.getEmail(),userDto.getPassword())}
-        //UserDto userDto = new UserDto("test","test");
-        //System.out.println(userService.userLogin(userDto).toString())
+        def requestBody = objectMapper.writeValueAsString(new UserDto("test@test.com","1234"))
 
-        expect: "Status is 200 and the response is 'userDto'"
-        mockMvc.perform(post("/user/login/test@test.com/1234"))
+        expect: "login success"
+        mockMvc.perform(post("/user/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
                 .andExpect(status().isOk())
                 .andReturn()
                 .response
-                .contentAsString == ""
                 .contentType == "application/json"
-
-
     }
     def "login failed"() {
         given:
-        given:
         userService.userLogin(_ as UserDto) >> { null }
-
-        expect: "Status is 200 and the response is 'null'"
-        mockMvc.perform(post("/user/login/test@test.com/12343"))
+        def requestBody = objectMapper.writeValueAsString(new UserDto("test@test.com","1234"))
+        expect: "login failed"
+        mockMvc.perform(post("/user/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
                 .andExpect(status().isOk())
                 .andReturn()
                 .response
                 .contentType == null
+    }
 
+    def "logout success"() {
+        given:
+        def userInfo = new UserDto("test@test.com","1234");
+        def session = new MockHttpSession();
+        session.setAttribute("userInfo",userInfo);
+
+        expect: "logout success"
+        mockMvc.perform(post("/user/logout"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .response
+    }
+
+    def "logout failed"() {
+        given:
+        def session = new MockHttpSession();
+
+        expect: "logout success"
+        mockMvc.perform(post("/user/logout"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .response
     }
 }

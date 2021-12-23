@@ -18,7 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     private final AbstractAuthenticationResolver authenticationResolver;
-    private final LoginInterceptor loginInterceptor;
+    //private final LoginInterceptor loginInterceptor;
     private static final List<String> URL_PATTERNS = Arrays.asList("/user/**");  //인터셉터가 동작 해야 될 요청 주소
 
     @Override
@@ -28,9 +28,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(loginInterceptor)
-            .addPathPatterns(URL_PATTERNS)
-            .excludePathPatterns("/user/test/**");
+        registry.addInterceptor(new LoginInterceptor())
+            .addPathPatterns("/");
+            //.excludePathPatterns("/user/login/**");
     }
 
 }

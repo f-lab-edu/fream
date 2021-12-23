@@ -37,10 +37,6 @@ public class UserController {
     public UserDto login(HttpSession session,
         @NotNull  @PathVariable String email
         ,@NotNull @PathVariable String password){
-        //logger.debug("controller start");
-        if(session.isNew()){
-            return (UserDto)session.getAttribute("userInfo");
-        }
 
         UserDto userDto = new UserDto(email,password);
         UserDto userInfo = userService.userLogin(userDto);

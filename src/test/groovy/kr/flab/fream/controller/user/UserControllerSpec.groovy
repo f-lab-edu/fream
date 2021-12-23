@@ -52,20 +52,40 @@ class UserControllerSpec extends Specification {
                 .contentAsString == "Hello world!"
     }
 
-    def "login success through interceptor"() {
+    def "when test is performed "() {
         given:
         userService.userLogin(_ as UserDto) >> { UserDto userDto -> new UserDto(userDto.getEmail(),userDto.getPassword())}
+        UserDto userDto = new UserDto("test","test");
+        System.out.println(userService.userLogin(userDto).toString())
+
+        expect: "Status is 200 and the response is 'Hello world!'"
+        mockMvc.perform(post("/user/test/test@test.com/1234"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .response
+                .contentType == "application/json"
+    }
+
+    def "login success"() {
+        given:
+        userService.userLogin(_ as UserDto) >> { UserDto userDto -> new UserDto(userDto.getEmail(),userDto.getPassword())}
+        //UserDto userDto = new UserDto("test","test");
+        //System.out.println(userService.userLogin(userDto).toString())
 
         expect: "Status is 200 and the response is 'userDto'"
         mockMvc.perform(post("/user/login/test@test.com/1234"))
                 .andExpect(status().isOk())
                 .andReturn()
                 .response
+                .contentAsString == ""
                 .contentType == "application/json"
 
+
     }
-    def "login failed through interceptor"() {
-        //given:
+    def "login failed"() {
+        given:
+        given:
+        userService.userLogin(_ as UserDto) >> { null }
 
         expect: "Status is 200 and the response is 'null'"
         mockMvc.perform(post("/user/login/test@test.com/12343"))

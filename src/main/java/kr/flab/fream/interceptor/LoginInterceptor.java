@@ -25,8 +25,8 @@ public class LoginInterceptor implements HandlerInterceptor {
         logger.debug("intercepts");
         System.out.println("interceptor");
         if(ObjectUtils.isEmpty(request.getSession().getAttribute("userInfo"))){
-            throw new Exception("not logined");
+            throw new Exception("required userInfo");
         }
-        return false;
+        return true;
     }
 }

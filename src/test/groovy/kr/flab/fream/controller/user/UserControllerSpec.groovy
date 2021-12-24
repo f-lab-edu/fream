@@ -55,15 +55,13 @@ class UserControllerSpec extends Specification {
     def "login failed"() {
         given:
         userService.userLogin(_ as UserDto) >> { null }
-        def requestBody = objectMapper.writeValueAsString(new UserDto("test@test.com","1234"))
+        def requestBody = objectMapper.writeValueAsString(new UserDto("test@test.com","12334"))
         expect: "login failed"
         mockMvc.perform(post("/user/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
-                .andExpect(status().isOk())
-                .andReturn()
-                .response
-                .contentType == null
+                .andExpect(thrown(Exception.class))
+
     }
 
     def "logout success"() {

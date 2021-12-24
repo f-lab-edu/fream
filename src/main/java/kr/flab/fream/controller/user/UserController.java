@@ -36,12 +36,14 @@ public class UserController {
 
     @RequestMapping(value = "/login")
     public UserDto login(HttpSession session,
-        @NotNull  @RequestBody UserDto loginInfo){
+        @NotNull  @RequestBody UserDto loginInfo) throws Exception {
         UserDto userDto = new UserDto(loginInfo.getEmail(),loginInfo.getPassword());
         UserDto userInfo = userService.userLogin(userDto);
-        if(!ObjectUtils.isEmpty(userInfo)){
-            session.setAttribute("userInfo",userInfo);
+
+        if(ObjectUtils.isEmpty(userInfo)){
+            throw new Exception("wrong input");
         }
+        session.setAttribute("userInfo",userInfo);
         return userInfo;
     }
 

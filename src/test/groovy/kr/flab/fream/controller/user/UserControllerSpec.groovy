@@ -1,6 +1,7 @@
 package kr.flab.fream.controller.user
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import jdk.javadoc.internal.doclets.toolkit.util.InternalException
 import kr.flab.fream.config.FormattingConfiguration
 import kr.flab.fream.config.ModelMapperConfiguration
 import kr.flab.fream.domain.auction.service.AuctionService
@@ -16,6 +17,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpSession
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.MockMvcBuilder
+import org.testcontainers.shaded.com.trilead.ssh2.Session
 import spock.lang.Specification
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -31,60 +34,58 @@ class UserControllerSpec extends Specification {
     @Autowired
     ObjectMapper objectMapper
 
-    @Autowired
-    ModelMapper modelMapper
-
     @SpringBean
     UserService userService = Stub()
 
 
     def "login success"() {
-        given:
-        userService.userLogin(_ as UserDto) >> { UserDto userDto -> new UserDto(userDto.getEmail(),userDto.getPassword())}
+        given:"loginInfo"
         def requestBody = objectMapper.writeValueAsString(new UserDto("test@test.com","1234"))
 
-        expect: "login success"
+        when:"valid input"
+        userService.userLogin(_ as UserDto) >> { UserDto userDto -> new UserDto(userDto.getEmail(),userDto.getPassword())}
+
+        then: "login success"
         mockMvc.perform(post("/user/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
                 .andExpect(status().isOk())
-                .andReturn()
-                .response
-                .contentType == "application/json"
     }
     def "login failed"() {
-        given:
-        userService.userLogin(_ as UserDto) >> { null }
+        given:"login info"
         def requestBody = objectMapper.writeValueAsString(new UserDto("test@test.com","12334"))
-        expect: "login failed"
+
+        when: "no valid input process"
+        userService.userLogin(_ as UserDto) >> { null }
+
         mockMvc.perform(post("/user/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
-                .andExpect(thrown(Exception.class))
-
+        then: "invoke 'not a valid input' exceptino"
+        thrown(Exception)
     }
 
     def "logout success"() {
-        given:
+        given:"session has userinfo"
         def userInfo = new UserDto("test@test.com","1234");
         def session = new MockHttpSession();
         session.setAttribute("userInfo",userInfo);
 
-        expect: "logout success"
-        mockMvc.perform(post("/user/logout"))
-                .andExpect(status().isOk())
-                .andReturn()
-                .response
+        when:"processing logout"
+        mockMvc.perform(post("/user/logout").session(session))
+
+        then:"logout success"
+        session.isInvalid() == true
     }
 
     def "logout failed"() {
-        given:
+        given:"session has not attr userinfo"
         def session = new MockHttpSession();
 
-        expect: "logout success"
-        mockMvc.perform(post("/user/logout"))
-                .andExpect(status().isOk())
-                .andReturn()
-                .response
+        when:"processing logout"
+        mockMvc.perform(post("/user/logout").session(session))
+
+        then: "login filed with exception 'required userInfo' "
+        thrown(Exception)
     }
 }

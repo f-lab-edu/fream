@@ -8,6 +8,7 @@ import kr.flab.fream.config.FormattingConfiguration
 import kr.flab.fream.config.ModelMapperConfiguration
 import kr.flab.fream.config.WebConfig
 import kr.flab.fream.controller.product.ProductDto
+import kr.flab.fream.domain.auction.AuctionSearchOption
 import kr.flab.fream.domain.auction.dto.SignAuctionResponse
 import kr.flab.fream.domain.auction.model.AuctionType
 import kr.flab.fream.domain.auction.service.AuctionService
@@ -22,6 +23,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.method.support.ModelAndViewContainer
@@ -224,4 +226,68 @@ class AuctionControllerSpec extends Specification {
         where:
         url << ["/auction/asks", "/auction/bids"]
     }
+
+    def "return 400 if inputs for the search option is invalid"() {
+        given:
+        def params = new LinkedMultiValueMap<String, String>()
+
+        for (def entry : (paramMap as Map<String, String>).entrySet()) {
+            params.add(entry.getKey(), entry.getValue())
+        }
+
+        def builder = get(url as String)
+            .params(params)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+
+        when:
+        def resultActions = mockMvc.perform(builder)
+
+        then:
+        resultActions.andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+
+        where:
+        [url, paramMap] << [
+            ["/auction/asks", "/auction/bids"],
+            [
+                Map.of(), // no product Id
+                Map.of("productId", "1", "lastPrice", "500000"), // lastPrice exists but lastAuctionId is null
+                Map.of("productId", "2", "lastAuctionId", "1"), // lastAuctionId exists but lastPrice is null
+                Map.of("productId", "2", "items", "0"), // items value is less than 1
+            ]
+        ].combinations()
+    }
+
+    def "return 200 if inputs for the search option is valid"() {
+        given:
+        def params = new LinkedMultiValueMap<String, String>()
+
+        for (def entry : (paramMap as Map<String, String>).entrySet()) {
+            params.add(entry.getKey(), entry.getValue())
+        }
+
+        def builder = get(url as String)
+            .params(params)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+
+        auctionService.getAuctions(_ as AuctionSearchOption) >> Collections.emptyList()
+
+        when:
+        def resultActions = mockMvc.perform(builder)
+
+        then:
+        resultActions.andExpect(status().is(HttpStatus.OK.value()))
+
+        where:
+        [url, paramMap] << [
+            ["/auction/asks", "/auction/bids"],
+            [
+                Map.of("productId", "1"),
+                Map.of("productId", "1", "lastPrice", "500000", "lastAuctionId", "2"),
+                Map.of("productId", "1", "sizeId", "2", "items", "1")
+            ]
+        ].combinations()
+    }
+
 }

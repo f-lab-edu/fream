@@ -48,6 +48,10 @@ public class AuctionSearchOption {
             if (this.lastPrice != null ^ this.lastAuctionId != null) {
                 throw new IllegalArgumentException("페이지 조회에 필요한 값의 일부가 없습니다.");
             }
+
+            if (this.items$value != null && this.items$value.compareTo(1) < 0) {
+                throw new IllegalArgumentException("가져올 데이터의 개수는 1개 이상이어야 합니다.");
+            }
         }
 
     }

@@ -28,6 +28,7 @@ class UserServiceSpec extends Specification {
         expect:
         userService.getUserById(1L).getId()==1L;
     }
+
     def"user login"(){
         given :
         def modelMapper = new ModelMapperConfiguration().modelMapper();
@@ -40,5 +41,19 @@ class UserServiceSpec extends Specification {
 
         expect:
         userService.userLogin(userDto).getPassword()=="1234"
+    }
+
+    def"user login failed"(){
+        given :
+        def modelMapper = new ModelMapperConfiguration().modelMapper();
+
+        UserMapper userMapper = Stub() {
+            getUser(_ as UserDto) >> { null}
+        }
+        UserDto userDto = new UserDto("test@test.com","1234");
+        def userService = new UserService(userMapper, modelMapper)
+
+        expect:
+        userService.userLogin(userDto)==null
     }
 }

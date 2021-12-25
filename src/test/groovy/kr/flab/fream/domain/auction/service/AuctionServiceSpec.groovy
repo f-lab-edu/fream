@@ -1,8 +1,10 @@
 package kr.flab.fream.domain.auction.service
 
+import kr.flab.domain.auction.AuctionFixtures
 import kr.flab.domain.product.ProductFixtures
 import kr.flab.fream.controller.auction.AuctionDto
 import kr.flab.fream.controller.auction.AuctionRequest
+import kr.flab.fream.domain.auction.AuctionSearchOption
 import kr.flab.fream.domain.auction.dto.SignAuctionResponse
 import kr.flab.fream.domain.auction.model.Ask
 import kr.flab.fream.domain.auction.model.AuctionType
@@ -19,6 +21,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
 
 import java.time.LocalDateTime
+import java.util.stream.Collectors
+
+import static org.assertj.core.api.Assertions.assertThat
 
 @SpringBootTest(classes = [AuctionService, ModelMapper])
 class AuctionServiceSpec extends Specification {
@@ -86,6 +91,29 @@ class AuctionServiceSpec extends Specification {
         response.getId() == auctionId
         response.getSignedAt() != null
         response instanceof SignAuctionResponse
+    }
+
+    def "get auctions"() {
+        given:
+        def searchOption = Mock(AuctionSearchOption)
+        def product = ProductFixtures.getNikeDunkLowRetroBlack()
+        auctionMapper.getAuctions(searchOption) >> [
+            AuctionFixtures.create("284000", product, product.getSize(1L), 60, AuctionType.ASK),
+            AuctionFixtures.create("287000", product, product.getSize(1L), 60, AuctionType.ASK),
+            AuctionFixtures.create("289000", product, product.getSize(1L), 60, AuctionType.ASK),
+        ]
+
+        when:
+        def auctions = sut.getAuctions(searchOption)
+
+        then:
+        assertThat(auctions.stream().map(a -> a.getPrice()).collect(Collectors.toList()))
+            .usingRecursiveComparison()
+            .isEqualTo([
+                new BigDecimal("284000"),
+                new BigDecimal("287000"),
+                new BigDecimal("289000"),
+            ])
     }
 
     private static def auction() {

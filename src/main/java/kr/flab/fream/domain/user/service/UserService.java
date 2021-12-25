@@ -26,11 +26,12 @@ public class UserService {
     }
 
     /**
+     * loginInfo 확인.
      *
-     * @param userDto
+     * @param userDto loginInfo
      */
-    public UserDto userLogin(UserDto userDto){
-        if(!ObjectUtils.isEmpty(userMapper.getUser(userDto))){
+    public UserDto userLogin(UserDto userDto) {
+        if (!ObjectUtils.isEmpty(userMapper.getUser(userDto))) {
             return modelMapper.map(userMapper.getUser(userDto), UserDto.class);
         }
         return null;

@@ -4,7 +4,13 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import kr.flab.fream.domain.user.model.Address;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 /**
@@ -33,9 +39,11 @@ public class UserDto implements Serializable {
     LocalDateTime updatedAt;
 
     /**
-     * 로그인시 이용되는 UserDto
-     * @param email
-     * @param password
+     * 로그인시 이용되는 UserDto.
+     * <P></P>
+     *
+     * @param email 사용자가 입력한 email
+     * @param password 사용자가 입력한 password
      */
     public UserDto(String email, String password) {
         this.email = email;

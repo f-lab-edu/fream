@@ -27,6 +27,10 @@
             fetchType="lazy"
             column="user_id"
             select="kr.flab.fream.mybatis.mapper.user.UserMapper.getUser"/>
+        <association property="bidder" javaType="kr.flab.fream.domain.user.model.User"
+            fetchType="lazy"
+            column="bidder_id"
+            select="kr.flab.fream.mybatis.mapper.user.UserMapper.getUser"/>
         <discriminator javaType="kr.flab.fream.domain.auction.model.AuctionType" column="type">
             <case value="ASK" resultType="kr.flab.fream.domain.auction.model.Ask"/>
             <case value="BID" resultType="kr.flab.fream.domain.auction.model.Bid"/>
@@ -51,10 +55,11 @@
 
     <update id="update" parameterType="kr.flab.fream.domain.auction.model.Auction">
         UPDATE auction
-        SET price      = #{price},
-            due_date   = #{dueDate},
-            product_id = #{product.id},
-            size_id    = #{size.id}
+        SET price       = #{price},
+            due_date    = #{dueDate},
+            signed_at   = #{signedAt},
+            canceled_at = #{canceledAt},
+            bidder_id   = #{bidder.id}
         WHERE id = #{id}
     </update>
 
@@ -68,9 +73,81 @@
                A.product_id  AS product_id,
                A.size_id     AS size_id,
                A.user_id     AS user_id,
+               A.bidder_id   AS bidder_id,
                A.type        AS type
         FROM auction AS A
         WHERE A.id = #{id}
+    </select>
+
+    <select id="getAuctionForUpdate" parameterType="long" resultMap="auctionResultMap">
+        SELECT A.id          AS id,
+               A.price       AS price,
+               A.created_at  AS created_at,
+               A.due_date    AS due_date,
+               A.canceled_at AS canceled_at,
+               A.signed_at   AS signed_at,
+               A.product_id  AS product_id,
+               A.size_id     AS size_id,
+               A.user_id     AS user_id,
+               A.bidder_id   AS bidder_id,
+               A.type        AS type
+        FROM auction AS A
+        WHERE A.id = #{id}
+            FOR
+        UPDATE
+    </select>
+
+    <resultMap id="AuctionSummaryByPriceAndSizeWithQuantity"
+        type="kr.flab.fream.controller.auction.AuctionSummaryByPriceAndSizeWithQuantity">
+        <result column="size" property="size"/>
+        <result column="price" property="price" javaType="java.math.BigDecimal"/>
+        <result column="quantity" property="quantity"/>
+        <result column="type" property="type"
+            javaType="kr.flab.fream.domain.auction.model.AuctionType"/>
+    </resultMap>
+
+    <select id="getAuctionSummaries" parameterType="long" resultType="java.util.List"
+        resultMap="AuctionSummaryByPriceAndSizeWithQuantity">
+        SELECT S.name AS size,
+        A.price AS price,
+        COUNT(A.price) AS quantity,
+        A.type AS type
+        FROM auction A, size S, (
+        SELECT DISTINCT A.price, A.size_id
+        FROM auction A
+        WHERE A.type = #{type}
+        AND A.canceled_at IS NULL
+        AND A.signed_at IS NULL
+        AND A.product_id = #{productId}
+        AND A.due_date > now()
+        <if test="sizeId != null">
+            AND A.size_id = #{sizeId}
+        </if>
+        <if test="lastPrice != null">
+            <if test="type.name().equals('ASK')">
+                AND A.price > #{lastPrice}
+            </if>
+            <if test="type.name().equals('BID')">
+                AND A.price &lt; #{lastPrice}
+            </if>
+        </if>
+        ORDER BY A.price
+        <if test="type.name().equals('BID')">
+            DESC
+        </if>
+        , A.size_id
+        LIMIT 10
+        ) AS P
+        WHERE A.price = P.price
+        AND A.size_id = P.size_id
+        AND A.type = #{type}
+        AND A.size_id = S.id
+        GROUP BY A.price, A.size_id
+        ORDER BY A.price
+        <if test="type.name().equals('BID')">
+            DESC
+        </if>
+        , A.size_id
     </select>
 
 </mapper>

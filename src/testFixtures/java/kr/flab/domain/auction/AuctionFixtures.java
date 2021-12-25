@@ -7,6 +7,7 @@ import kr.flab.fream.domain.auction.model.AuctionType;
 import kr.flab.fream.domain.product.model.Product;
 import kr.flab.fream.domain.product.model.Size;
 import kr.flab.fream.domain.user.model.User;
+import kr.flab.user.UserFixtures;
 
 public class AuctionFixtures {
 
@@ -15,10 +16,10 @@ public class AuctionFixtures {
 
     public static Auction create(String price, Product product, Size size, long endOfDays,
             AuctionType type) {
-        User user = new User(1L);
+        User user = UserFixtures.tester();
 
         AuctionRequest request = new AuctionRequest(new BigDecimal(price), product.getId(),
-                size.getId(), 1L, endOfDays, type);
+                size.getId(), user.getId(), endOfDays, type);
         Auction auction = type.constructor.apply(request);
         auction.setUser(user);
         auction.setProduct(product);

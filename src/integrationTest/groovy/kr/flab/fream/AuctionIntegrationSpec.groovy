@@ -2,6 +2,11 @@ package kr.flab.fream
 
 import io.restassured.http.ContentType
 import kr.flab.fream.domain.auction.model.AuctionType
+import kr.flab.fream.mybatis.mapper.auction.AuctionMapper
+import kr.flab.fream.mybatis.mapper.product.ProductMapper
+import kr.flab.fream.mybatis.mapper.user.AddressMapper
+import kr.flab.fream.mybatis.mapper.user.UserMapper
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.http.HttpStatus
 
@@ -12,6 +17,18 @@ class AuctionIntegrationSpec extends BaseIntegrationSpec {
 
     @LocalServerPort
     int port
+
+    @Autowired
+    ProductMapper productMapper
+
+    @Autowired
+    UserMapper userMapper
+
+    @Autowired
+    AuctionMapper auctionMapper
+
+    @Autowired
+    AddressMapper addressMapper
 
     def "create #type"() {
         given:
@@ -72,6 +89,23 @@ class AuctionIntegrationSpec extends BaseIntegrationSpec {
 
         then:
         response.getStatusCode() == HttpStatus.NO_CONTENT.value()
+    }
+
+    def "get auction summaries"() {
+        given:
+        def request = given(this.spec)
+            .filter(document("auction/" + type + "/summaries"))
+            .log()
+            .all()
+
+        when:
+        def response = request.when().port(this.port).get("/auction/" + type + "/summaries?productId=1")
+
+        then:
+        response.getStatusCode() == HttpStatus.OK.value()
+
+        where:
+        type << ['asks', 'bids']
     }
 
 }

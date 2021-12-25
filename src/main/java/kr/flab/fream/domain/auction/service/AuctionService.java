@@ -1,15 +1,19 @@
 package kr.flab.fream.domain.auction.service;
 
+import java.math.BigDecimal;
+import java.util.List;
+import javax.annotation.Nullable;
 import kr.flab.fream.controller.auction.AuctionDto;
 import kr.flab.fream.controller.auction.AuctionPatchRequest;
 import kr.flab.fream.controller.auction.AuctionRequest;
-import kr.flab.fream.controller.user.UserDto;
+import kr.flab.fream.controller.auction.AuctionSummaryByPriceAndSizeWithQuantity;
+import kr.flab.fream.domain.auction.dto.SignAuctionResponse;
 import kr.flab.fream.domain.auction.model.Auction;
+import kr.flab.fream.domain.auction.model.AuctionType;
 import kr.flab.fream.domain.product.model.Product;
 import kr.flab.fream.domain.product.model.Size;
 import kr.flab.fream.domain.product.service.ProductService;
 import kr.flab.fream.domain.user.model.User;
-import kr.flab.fream.domain.user.service.UserService;
 import kr.flab.fream.mybatis.mapper.auction.AuctionMapper;
 import kr.flab.fream.mybatis.mapper.user.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +35,20 @@ public class AuctionService {
     private final UserMapper userMapper;
     private final ProductService productService;
     private final ModelMapper modelMapper;
+
+    /**
+     * 구매 혹은 판매 입찰의 가격별 수량 조회.
+     *
+     * @param type      입찰 타입
+     * @param productId 조회할 상품 번호
+     * @param sizeId    조회할 상품의 특정 사이즈 번호
+     * @param lastPrice 마지막으로 조회했던 가격
+     * @return 사이즈별 가격과 수량을 반환
+     */
+    public List<AuctionSummaryByPriceAndSizeWithQuantity> getAuctionSummaries(AuctionType type,
+            Long productId, @Nullable Long sizeId, @Nullable BigDecimal lastPrice) {
+        return auctionMapper.getAuctionSummaries(type, productId, sizeId, lastPrice);
+    }
 
     /**
      * 구매 입찰을 생성한다.
@@ -80,6 +98,20 @@ public class AuctionService {
         auction.cancel();
 
         auctionMapper.update(auction);
+    }
+
+    /**
+     * 입찰을 체결한다.
+     *
+     * @param bidder    낙찰받은 유저
+     * @param auctionId 입찰 ID
+     */
+    public SignAuctionResponse sign(User bidder, Long auctionId) {
+        Auction auction = auctionMapper.getAuctionForUpdate(auctionId);
+        auction.sign(bidder);
+        auctionMapper.update(auction);
+
+        return modelMapper.map(auction, SignAuctionResponse.getTypeObject());
     }
 
     private AuctionDto convert(Auction auction) {

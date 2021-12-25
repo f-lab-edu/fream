@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Objects;
 import java.util.function.Predicate;
 import kr.flab.fream.controller.auction.AuctionRequest;
 import kr.flab.fream.domain.product.model.Product;
@@ -39,6 +40,8 @@ public class Auction {
     private Size size;
     @Setter
     private User user;
+
+    private User bidder;
 
     @Setter
     private AuctionState state;
@@ -83,10 +86,14 @@ public class Auction {
     /**
      * 입찰 완료 처리한다.
      */
-    public void sign() {
+    public void sign(User bidder) {
+        if (Objects.equals(this.user.getId(), bidder.getId())) {
+            throw new IllegalArgumentException("직접 등록한 입찰에 참여할 수 없습니다.");
+        }
         state.finish(this);
 
         this.signedAt = LocalDateTime.now();
+        this.bidder = bidder;
     }
 
     /**

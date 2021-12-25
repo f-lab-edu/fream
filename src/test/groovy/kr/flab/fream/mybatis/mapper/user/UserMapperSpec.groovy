@@ -48,16 +48,19 @@ class UserMapperSpec extends DatabaseTest {
         expect:
         userMapper.joinUser(user) == 1
     }
-<<<<<<< HEAD
+
     def "get user by id"() {
         expect:
-        userMapper.getUserById(1L).getAddressBook().size()==3
-=======
+        userMapper.getUserById(1L).getAddressBook().size() == 3
+    }
 
     def "get user"() {
+        given:
+        UserDto userDto = new UserDto();
+        userDto.setEmail("test@test2.com");
+        userDto.setPassword("1234");
         expect:
-        userMapper.getUser(1L).getAddressBook().size() == 3
->>>>>>> e017b5d6a08c133643218ef0eb2501531c6e2a3b
+        userMapper.getUser(userDto).getAddressBook().size()==1
     }
 
     def "delete user"() {
@@ -69,16 +72,6 @@ class UserMapperSpec extends DatabaseTest {
         expect:
         userMapper.deleteUser(user) == 1
     }
-<<<<<<< HEAD
-    def "get user"() {
-        given:
-        UserDto userDto = new UserDto();
-        userDto.setEmail("test@test2.com");
-        userDto.setPassword("1234");
-        expect:
-        userMapper.getUser(userDto).getAddressBook().size()==1
-    }
+
+
 }
-=======
-}
->>>>>>> e017b5d6a08c133643218ef0eb2501531c6e2a3b

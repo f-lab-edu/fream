@@ -1,6 +1,7 @@
 package kr.flab.fream.domain.user.service;
 
 import javax.servlet.http.HttpSession;
+import kr.flab.fream.controller.user.LoginDto;
 import kr.flab.fream.controller.user.UserDto;
 import kr.flab.fream.domain.user.model.User;
 import kr.flab.fream.mybatis.mapper.user.UserMapper;
@@ -26,13 +27,14 @@ public class UserService {
     }
 
     /**
-     * loginInfo 확인.
      *
-     * @param userDto loginInfo
+     * @param loginInfo '로그인 정보'
+     * @return
      */
-    public UserDto userLogin(UserDto userDto) {
-        if (!ObjectUtils.isEmpty(userMapper.getUser(userDto))) {
-            return modelMapper.map(userMapper.getUser(userDto), UserDto.class);
+
+    public UserDto userLogin(LoginDto loginInfo) {
+        if (!ObjectUtils.isEmpty(userMapper.getUser(loginInfo))) {
+            return modelMapper.map(userMapper.getUser(loginInfo), UserDto.class);
         }
         return null;
     }

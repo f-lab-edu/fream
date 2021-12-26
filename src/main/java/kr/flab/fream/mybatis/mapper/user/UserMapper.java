@@ -1,5 +1,6 @@
 package kr.flab.fream.mybatis.mapper.user;
 
+import kr.flab.fream.controller.user.LoginDto;
 import kr.flab.fream.controller.user.UserDto;
 import kr.flab.fream.domain.user.model.User;
 import org.apache.ibatis.annotations.Mapper;
@@ -15,7 +16,7 @@ public interface UserMapper {
 
     User getUserById(Long id);
 
-    User getUser(UserDto userDto);
+    User getUser(LoginDto loginInfo);
 
     int joinUser(User user);
 

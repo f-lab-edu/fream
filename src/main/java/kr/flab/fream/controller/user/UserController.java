@@ -1,6 +1,7 @@
 package kr.flab.fream.controller.user;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import kr.flab.fream.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -33,12 +34,11 @@ public class UserController {
      */
     @RequestMapping(value = "/login")
     public UserDto login(HttpSession session,
-            @NotNull  @RequestBody UserDto loginInfo) throws Exception {
-        UserDto userDto = new UserDto(loginInfo.getEmail(), loginInfo.getPassword());
-        UserDto userInfo = userService.userLogin(userDto);
+            @Valid @NotNull @RequestBody LoginDto loginInfo) throws Exception {
+        UserDto userInfo = userService.userLogin(loginInfo);
 
         if (ObjectUtils.isEmpty(userInfo)) {
-            throw new Exception("not a valid input");
+            //throw new Exception("not a valid input");
         }
         session.setAttribute("userInfo", userInfo);
         return userInfo;

@@ -40,10 +40,10 @@ class UserControllerSpec extends Specification {
 
     def "login success"() {
         given:"loginInfo"
-        def requestBody = objectMapper.writeValueAsString(new UserDto("test@test.com","1234"))
+        def requestBody = objectMapper.writeValueAsString(new LoginDto("test@test.com","1234"))
 
         when:"valid input"
-        userService.userLogin(_ as UserDto) >> { UserDto userDto -> new UserDto(userDto.getEmail(),userDto.getPassword())}
+        userService.userLogin(_ as LoginDto) >> { LoginDto LoginInfo -> new LoginDto(LoginInfo.getEmail(),LoginInfo.getPassword())}
 
         then: "login success"
         mockMvc.perform(post("/user/login")
@@ -53,10 +53,10 @@ class UserControllerSpec extends Specification {
     }
     def "login failed"() {
         given:"login info"
-        def requestBody = objectMapper.writeValueAsString(new UserDto("test@test.com","12334"))
+        def requestBody = objectMapper.writeValueAsString(new LoginDto("test@test.com","12334"))
 
         when: "no valid input process"
-        userService.userLogin(_ as UserDto) >> { null }
+        userService.userLogin(_ as LoginDto) >> { null }
 
         mockMvc.perform(post("/user/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -65,9 +65,27 @@ class UserControllerSpec extends Specification {
         thrown(Exception)
     }
 
+    def "valid loginInfo"() {
+        given:"login info"
+        def requestBody = objectMapper.writeValueAsString(new LoginDto("" +
+                "" +
+                "" +
+                ""))
+
+        when: "no valid input process"
+        userService.userLogin(_ as LoginDto) >> { null }
+
+        mockMvc.perform(post("/user/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+        then: "invoke 'not a valid input' exceptino"
+        thrown(Exception)
+    }
+
+
     def "logout success"() {
         given:"session has userinfo"
-        def userInfo = new UserDto("test@test.com","1234");
+        def userInfo = new UserDto();
         def session = new MockHttpSession();
         session.setAttribute("userInfo",userInfo);
 

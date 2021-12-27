@@ -1,6 +1,7 @@
 package kr.flab.fream.mybatis.mapper.user
 
 import kr.flab.fream.DatabaseTest
+import kr.flab.fream.controller.user.LoginDto
 import kr.flab.fream.controller.user.UserDto
 import kr.flab.fream.domain.user.model.User
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
@@ -56,11 +57,11 @@ class UserMapperSpec extends DatabaseTest {
 
     def "get user"() {
         given:
-        UserDto userDto = new UserDto();
-        userDto.setEmail("test@test2.com");
-        userDto.setPassword("1234");
+        LoginDto loginInfo = new LoginDto();
+        loginInfo.setEmail("test@test2.com");
+        loginInfo.setPassword("1234");
         expect:
-        userMapper.getUser(userDto).getAddressBook().size()==1
+        userMapper.getUser(loginInfo).getAddressBook().size()==1
     }
 
     def "delete user"() {

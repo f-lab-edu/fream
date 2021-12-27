@@ -37,16 +37,4 @@ public class UserDto implements Serializable {
     String account;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-
-    /**
-     * 로그인시 이용되는 UserDto.
-     * <P></P>
-     *
-     * @param email 사용자가 입력한 email
-     * @param password 사용자가 입력한 password
-     */
-    public UserDto(String email, String password) {
-        this.email = email;
-        this.password = password;
-    }
 }

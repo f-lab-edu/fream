@@ -7,7 +7,10 @@ import kr.flab.fream.config.ModelMapperConfiguration
 import kr.flab.fream.domain.auction.service.AuctionService
 import kr.flab.fream.domain.user.model.User
 import kr.flab.fream.domain.user.service.UserService
+import kr.flab.fream.interceptor.LoginInterceptor
 import kr.flab.fream.mybatis.mapper.user.UserMapper
+import kr.flab.fream.mybatis.util.exception.NoAuthenticationException
+import org.apache.tomcat.jni.Status
 import org.modelmapper.ModelMapper
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,6 +21,7 @@ import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpSession
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MockMvcBuilder
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.testcontainers.shaded.com.trilead.ssh2.Session
 import spock.lang.Specification
 
@@ -34,9 +38,15 @@ class UserControllerSpec extends Specification {
     @Autowired
     ObjectMapper objectMapper
 
+
     @SpringBean
     UserService userService = Stub()
 
+    @Autowired
+    UserController userController
+
+    @Autowired
+    LoginInterceptor loginInterceptor
 
     def "login success"() {
         given:"loginInfo"
@@ -54,15 +64,18 @@ class UserControllerSpec extends Specification {
     def "login failed"() {
         given:"login info"
         def requestBody = objectMapper.writeValueAsString(new UserDto("test@test.com","12334"))
-
+        def mvc = MockMvcBuilders.standaloneSetup(userController)
+                .addInterceptors(loginInterceptor)
+                .build()
         when: "no valid input process"
         userService.userLogin(_ as UserDto) >> { null }
 
-        mockMvc.perform(post("/user/login")
+        def resultAction = mvc.perform(post("/user/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
         then: "invoke 'not a valid input' exceptino"
-        thrown(Exception)
+        thrown(NoAuthenticationException)
+
     }
 
     def "logout success"() {
@@ -83,9 +96,11 @@ class UserControllerSpec extends Specification {
         def session = new MockHttpSession();
 
         when:"processing logout"
-        mockMvc.perform(post("/user/logout").session(session))
+        def resultAction=mockMvc.perform(post("/user/logout").session(session))
 
         then: "login filed with exception 'required userInfo' "
-        thrown(Exception)
+        //resultAction.andExpect(status().isUnauthorized())
+        //thrown(NoAuthenticationException.class)
+        thrown(NoAuthenticationException)
     }
 }

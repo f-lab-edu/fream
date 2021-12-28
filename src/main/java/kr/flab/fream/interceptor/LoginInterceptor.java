@@ -3,6 +3,7 @@ package kr.flab.fream.interceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import kr.flab.fream.mybatis.util.exception.NoAuthenticationException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -16,7 +17,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
             Object handler)throws Exception {
         if (ObjectUtils.isEmpty(request.getSession().getAttribute("userInfo"))) {
-            throw new Exception("required userInfo");
+            throw new NoAuthenticationException();
         }
         return true;
     }

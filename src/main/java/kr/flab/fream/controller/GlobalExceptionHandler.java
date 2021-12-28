@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import kr.flab.fream.mybatis.util.exception.NoAuthenticationException;
 import lombok.Builder;
 import lombok.Value;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -32,6 +33,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error(e.getMessage())
+
+
+
                 .build();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -58,7 +62,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Value
     @Builder
     public static class ErrorResponse {
-
         LocalDateTime timestamp;
         Integer status;
         String error;

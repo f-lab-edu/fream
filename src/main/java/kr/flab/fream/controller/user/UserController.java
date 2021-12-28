@@ -38,7 +38,7 @@ public class UserController {
         UserDto userInfo = userService.userLogin(loginInfo);
 
         if (ObjectUtils.isEmpty(userInfo)) {
-            //throw new Exception("not a valid input");
+            throw new Exception("not a valid input");
         }
         session.setAttribute("userInfo", userInfo);
         return userInfo;

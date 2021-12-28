@@ -1,6 +1,7 @@
 package kr.flab.fream.domain.user.service
 
 import kr.flab.fream.config.ModelMapperConfiguration
+import kr.flab.fream.controller.user.LoginDto
 import kr.flab.fream.controller.user.UserDto
 import kr.flab.fream.domain.user.model.User
 import kr.flab.fream.mybatis.mapper.user.UserMapper
@@ -34,13 +35,13 @@ class UserServiceSpec extends Specification {
         def modelMapper = new ModelMapperConfiguration().modelMapper();
 
         UserMapper userMapper = Stub() {
-            getUser(_ as UserDto) >> { UserDto userDto -> new User(userDto.getEmail(),userDto.getPassword())}
+            getUser(_ as LoginDto) >> { LoginDto LoginInfo -> new User(LoginInfo.getEmail(),LoginInfo.getPassword())}
         }
-        UserDto userDto = new UserDto("test@test.com","1234");
+        LoginDto LoginInfo = new LoginDto("test@test.com","1234");
         def userService = new UserService(userMapper, modelMapper)
 
         expect:
-        userService.userLogin(userDto).getPassword()=="1234"
+        userService.userLogin(LoginInfo).getPassword()=="1234"
     }
 
     def"user login failed"(){
@@ -48,12 +49,12 @@ class UserServiceSpec extends Specification {
         def modelMapper = new ModelMapperConfiguration().modelMapper();
 
         UserMapper userMapper = Stub() {
-            getUser(_ as UserDto) >> { null}
+            getUser(_ as LoginDto) >> { null}
         }
-        UserDto userDto = new UserDto("test@test.com","1234");
+        LoginDto loginInfo = new LoginDto("test@test.com","1234");
         def userService = new UserService(userMapper, modelMapper)
 
         expect:
-        userService.userLogin(userDto)==null
+        userService.userLogin(loginInfo)==null
     }
 }

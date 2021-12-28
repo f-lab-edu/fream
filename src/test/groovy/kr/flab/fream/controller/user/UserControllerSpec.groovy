@@ -53,7 +53,6 @@ class UserControllerSpec extends Specification {
 
     def "login success"() {
         given:"loginInfo"
-        def requestBody = objectMapper.writeValueAsString(new UserDto("test@test.com","1234"))
         def requestBody = objectMapper.writeValueAsString(new LoginDto("test@test.com","1234"))
 
         when:"valid input"

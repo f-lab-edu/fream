@@ -56,7 +56,7 @@ class UserControllerSpec extends Specification {
         def requestBody = objectMapper.writeValueAsString(new LoginDto("test@test.com","1234"))
 
         when:"valid input"
-        userService.userLogin(_ as UserDto) >> { UserDto userDto -> new UserDto(userDto.getEmail(),userDto.getPassword())}
+        //userService.userLogin(_ as UserDto) >> { UserDto userDto -> new UserDto(userDto.getEmail(),userDto.getPassword())}
         userService.userLogin(_ as LoginDto) >> { LoginDto LoginInfo -> new LoginDto(LoginInfo.getEmail(),LoginInfo.getPassword())}
 
         then: "login success"
@@ -71,19 +71,20 @@ class UserControllerSpec extends Specification {
      */
     def "login failed"() {
         given:"login info"
-        def requestBody = objectMapper.writeValueAsString(new UserDto("test@test.com","12334"))
+        def requestBody = objectMapper.writeValueAsString(new LoginDto("test@test.com","12334"))
         def mvc = MockMvcBuilders.standaloneSetup(userController)
                 .addInterceptors(loginInterceptor)
                 .build()
         when: "no valid input process"
-        userService.userLogin(_ as UserDto) >> { null }
+        //userService.userLogin(_ as UserDto) >> { null }
         userService.userLogin(_ as LoginDto) >> { null }
 
         mockMvc.perform(post("/user/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
         then: "invoke 'not a valid input' exceptino"
-        thrown(Exception)
+        thrown(NoAuthenticationException)
+        //thrown(Exception)
         //1==1
     }
     /**
@@ -123,9 +124,11 @@ class UserControllerSpec extends Specification {
     def "logout failed"() {
         given:"session has not attr userinfo"
         def session = new MockHttpSession();
-
+        def mvc = MockMvcBuilders.standaloneSetup(userController)
+                .addInterceptors(loginInterceptor)
+                .build()
         when:"processing logout"
-        def resultAction=mockMvc.perform(post("/user/logout").session(session))
+        def resultAction=mvc.perform(post("/user/logout").session(session))
 
         then: "login filed with exception 'required userInfo' "
         //resultAction.andExpect(status().isUnauthorized())

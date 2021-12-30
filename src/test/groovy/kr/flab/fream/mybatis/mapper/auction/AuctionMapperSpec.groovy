@@ -4,6 +4,7 @@ import kr.flab.domain.auction.AuctionFixtures
 import kr.flab.fream.DatabaseClearConfig
 import kr.flab.fream.DatabaseTest
 import kr.flab.fream.controller.auction.AuctionSummaryByPriceAndSizeWithQuantity
+import kr.flab.fream.domain.auction.AuctionSearchOption
 import kr.flab.fream.domain.auction.model.AuctionType
 import kr.flab.fream.domain.user.model.User
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
@@ -157,6 +158,54 @@ class AuctionMapperSpec extends DatabaseTest {
                 new AuctionSummaryByPriceAndSizeWithQuantity("265", new BigDecimal("495000.00"), 1, AuctionType.BID),
             ),
         ]
+    }
+
+    @Sql("/db-test-data/auction/get-ask-summaries.sql")
+    def "get lowest ASK auction"() {
+        given:
+        def type = AuctionType.ASK
+        def productId = 2L
+
+        def searchOption = AuctionSearchOption.builder()
+            .auctionType(type)
+            .items(1)
+            .productId(productId)
+            .build()
+
+        when:
+        def auctions =
+            auctionMapper.getAuctions(searchOption)
+
+        then:
+        auctions.size() == 1
+
+        and:
+        assertThat(auctions.get(0).getPrice()).isEqualTo(new BigDecimal("550000.00"))
+    }
+
+    @Sql("/db-test-data/auction/get-bid-summaries.sql")
+    def "get highest BID"() {
+        given:
+        def type = AuctionType.BID
+        def productId = 2L
+        def sizeId = 10L
+
+        def searchOption = AuctionSearchOption.builder()
+            .auctionType(type)
+            .items(1)
+            .productId(productId)
+            .sizeId(sizeId)
+            .build()
+
+        when:
+        def auctions =
+            auctionMapper.getAuctions(searchOption)
+
+        then:
+        auctions.size() == 1
+
+        and:
+        assertThat(auctions.get(0).getPrice()).isEqualTo(new BigDecimal("530000.00"))
     }
 
 }

@@ -36,10 +36,6 @@ public class UserController {
     public UserDto login(HttpSession session,
             @Valid @NotNull @RequestBody LoginDto loginInfo) throws Exception {
         UserDto userInfo = userService.userLogin(loginInfo);
-
-        if (ObjectUtils.isEmpty(userInfo)) {
-            throw new Exception("not a valid input");
-        }
         session.setAttribute("userInfo", userInfo);
         return userInfo;
     }

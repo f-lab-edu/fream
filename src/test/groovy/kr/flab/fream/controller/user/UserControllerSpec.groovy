@@ -22,6 +22,7 @@ import org.springframework.mock.web.MockHttpSession
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.web.server.ResponseStatusException
 import org.testcontainers.shaded.com.trilead.ssh2.Session
 import spock.lang.Specification
 
@@ -37,7 +38,6 @@ class UserControllerSpec extends Specification {
 
     @Autowired
     ObjectMapper objectMapper
-
 
     @SpringBean
     UserService userService = Stub()
@@ -92,20 +92,19 @@ class UserControllerSpec extends Specification {
      * @return
      */
     def "invalid loginInfo "() {
-        given:"login info"
-        def requestBody = objectMapper.writeValueAsString(new LoginDto())
+        given: "login info"
+        def requestBody = objectMapper.writeValueAsString(new LoginDto("test@test.com","12334"))
 
         when: "no valid input process"
-        userService.userLogin(_ as LoginDto) >> { null }
+        userService.userLogin(_ as LoginDto) >> { throw ResponseStatusException}
 
-
-        def resultAction = mvc.perform(post("/user/login")
+        def resultAction = mockMvc.perform(post("/user/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
         then: "invoke 'not a valid input' exceptino"
-        thrown(NoAuthenticationException)
-
+        resultAction.andExpect(status().isUnauthorized())
     }
+
 
 
     def "logout success"() {

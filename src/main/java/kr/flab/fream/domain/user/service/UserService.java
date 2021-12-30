@@ -1,5 +1,6 @@
 package kr.flab.fream.domain.user.service;
 
+import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpSession;
 import kr.flab.fream.controller.user.LoginDto;
 import kr.flab.fream.controller.user.UserDto;
@@ -8,8 +9,10 @@ import kr.flab.fream.mybatis.mapper.user.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * 사용자 서비스.
@@ -36,6 +39,6 @@ public class UserService {
         if (!ObjectUtils.isEmpty(userMapper.getUser(loginInfo))) {
             return modelMapper.map(userMapper.getUser(loginInfo), UserDto.class);
         }
-        return null;
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인 정보가 유효하지 않습니다.");
     }
 }

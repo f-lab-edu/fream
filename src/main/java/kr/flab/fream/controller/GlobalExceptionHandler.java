@@ -33,9 +33,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error(e.getMessage())
-
-
-
                 .build();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -53,7 +50,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(errorResponse, httpStatus);
     }
-
     /**
      * 글로벌 예외가 발생할 때 사용할 DTO 객체.
      *

@@ -9,7 +9,9 @@ import org.modelmapper.ModelMapper
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpStatus
 import org.springframework.mock.web.MockHttpSession
+import org.springframework.web.server.ResponseStatusException
 import spock.lang.Specification
 
 import javax.servlet.http.HttpSession
@@ -54,7 +56,11 @@ class UserServiceSpec extends Specification {
         LoginDto loginInfo = new LoginDto("test@test.com","1234");
         def userService = new UserService(userMapper, modelMapper)
 
-        expect:
-        userService.userLogin(loginInfo)==null
+        when:
+        userService.userLogin(loginInfo)
+
+        then:
+        thrown(ResponseStatusException)
+
     }
 }

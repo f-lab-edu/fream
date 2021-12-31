@@ -124,9 +124,10 @@ class UserControllerSpec extends Specification {
                 .addInterceptors(loginInterceptor)
                 .build()
         when:"processing logout"
-        def resultAction=mvc.perform(post("/user/logout").session(session))
+        def resultAction=mockMvc.perform(post("/user/logout").session(session))
 
-        then: "login filed with exception 'required userInfo' "
+        then: "login filed with exception 'requir" +
+                "ed userInfo' "
         thrown(NoAuthenticationException)
     }
 }

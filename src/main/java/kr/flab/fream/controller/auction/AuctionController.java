@@ -5,6 +5,7 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import kr.flab.fream.auth.Authentication;
+import kr.flab.fream.domain.auction.AuctionSearchOption;
 import kr.flab.fream.domain.auction.dto.SignAuctionResponse;
 import kr.flab.fream.domain.auction.model.AuctionType;
 import kr.flab.fream.domain.auction.service.AuctionService;
@@ -35,8 +36,44 @@ public class AuctionController {
 
     private final AuctionService service;
 
+    @GetMapping("/asks")
+    public List<AuctionDto> getAsks(
+            @RequestParam @Valid @NotNull Long productId,
+            @RequestParam(required = false) Long sizeId,
+            @RequestParam(required = false) Long lastAuctionId,
+            @RequestParam(required = false) BigDecimal lastPrice,
+            @RequestParam(required = false) Integer items
+    ) {
+        return getAuctions(AuctionType.ASK, productId, sizeId, lastAuctionId, lastPrice, items);
+    }
+
+    @GetMapping("/bids")
+    public List<AuctionDto> getBids(
+            @RequestParam @Valid @NotNull Long productId,
+            @RequestParam(required = false) Long sizeId,
+            @RequestParam(required = false) Long lastAuctionId,
+            @RequestParam(required = false) BigDecimal lastPrice,
+            @RequestParam(required = false) Integer items
+    ) {
+        return getAuctions(AuctionType.BID, productId, sizeId, lastAuctionId, lastPrice, items);
+    }
+
+    private List<AuctionDto> getAuctions(AuctionType type, Long productId, Long sizeId,
+            Long lastAuctionId, BigDecimal lastPrice, Integer items) {
+        AuctionSearchOption searchOption = AuctionSearchOption.builder()
+                .auctionType(type)
+                .productId(productId)
+                .sizeId(sizeId)
+                .lastAuctionId(lastAuctionId)
+                .lastPrice(lastPrice)
+                .items(items)
+                .build();
+
+        return service.getAuctions(searchOption);
+    }
+
     @GetMapping("/asks/summaries")
-    public List<AuctionSummaryByPriceAndSizeWithQuantity> getAsks(
+    public List<AuctionSummaryByPriceAndSizeWithQuantity> getAskSummaries(
             @RequestParam @Valid @NotNull Long productId,
             @RequestParam(required = false) Long sizeId,
             @RequestParam(required = false) BigDecimal lastPrice
@@ -45,7 +82,7 @@ public class AuctionController {
     }
 
     @GetMapping("/bids/summaries")
-    public List<AuctionSummaryByPriceAndSizeWithQuantity> getBids(
+    public List<AuctionSummaryByPriceAndSizeWithQuantity> getBidSummaries(
             @RequestParam @Valid @NotNull Long productId,
             @RequestParam(required = false) Long sizeId,
             @RequestParam(required = false) BigDecimal lastPrice

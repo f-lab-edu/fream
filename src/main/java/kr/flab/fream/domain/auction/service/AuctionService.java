@@ -7,6 +7,7 @@ import kr.flab.fream.controller.auction.AuctionDto;
 import kr.flab.fream.controller.auction.AuctionPatchRequest;
 import kr.flab.fream.controller.auction.AuctionRequest;
 import kr.flab.fream.controller.auction.AuctionSummaryByPriceAndSizeWithQuantity;
+import kr.flab.fream.domain.auction.AuctionSearchOption;
 import kr.flab.fream.domain.auction.dto.SignAuctionResponse;
 import kr.flab.fream.domain.auction.model.Auction;
 import kr.flab.fream.domain.auction.model.AuctionType;
@@ -18,6 +19,7 @@ import kr.flab.fream.mybatis.mapper.auction.AuctionMapper;
 import kr.flab.fream.mybatis.mapper.user.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +39,22 @@ public class AuctionService {
     private final ModelMapper modelMapper;
 
     /**
+     * 입찰 목록을 조회한다.
+     * <br>
+     * 구매 입찰은 내림차순으로, 판매 입찰은 오름차순으로 정렬되며 가격이 같다면 id 기준 오름차순으로
+     * 정렬하여 결과를 반환한다.
+     *
+     * @param searchOption 조회 시 사용할 옵션
+     * @return 입찰 목록 반환
+     */
+    @Transactional(readOnly = true)
+    public List<AuctionDto> getAuctions(AuctionSearchOption searchOption) {
+        List<Auction> auctions = auctionMapper.getAuctions(searchOption);
+
+        return modelMapper.map(auctions, new TypeToken<List<Auction>>(){}.getType());
+    }
+
+    /**
      * 구매 혹은 판매 입찰의 가격별 수량 조회.
      *
      * @param type      입찰 타입
@@ -45,6 +63,7 @@ public class AuctionService {
      * @param lastPrice 마지막으로 조회했던 가격
      * @return 사이즈별 가격과 수량을 반환
      */
+    @Transactional(readOnly = true)
     public List<AuctionSummaryByPriceAndSizeWithQuantity> getAuctionSummaries(AuctionType type,
             Long productId, @Nullable Long sizeId, @Nullable BigDecimal lastPrice) {
         return auctionMapper.getAuctionSummaries(type, productId, sizeId, lastPrice);

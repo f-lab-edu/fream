@@ -3,6 +3,7 @@ package kr.flab.fream.mybatis.mapper.auction;
 import java.math.BigDecimal;
 import java.util.List;
 import kr.flab.fream.controller.auction.AuctionSummaryByPriceAndSizeWithQuantity;
+import kr.flab.fream.domain.auction.AuctionSearchOption;
 import kr.flab.fream.domain.auction.model.Auction;
 import kr.flab.fream.domain.auction.model.AuctionType;
 import org.apache.ibatis.annotations.Mapper;
@@ -28,4 +29,5 @@ public interface AuctionMapper {
     List<AuctionSummaryByPriceAndSizeWithQuantity> getAuctionSummaries(AuctionType type,
             Long productId, Long sizeId, BigDecimal lastPrice);
 
+    List<Auction> getAuctions(AuctionSearchOption searchOption);
 }

@@ -63,18 +63,25 @@
         WHERE id = #{id}
     </update>
 
+    <sql id="allAuctionColumns">
+        ${alias}.id          AS id,
+        ${alias}.price       AS price,
+        ${alias}.created_at  AS created_at,
+        ${alias}.due_date    AS due_date,
+        ${alias}.canceled_at AS canceled_at,
+        ${alias}.signed_at   AS signed_at,
+        ${alias}.product_id  AS product_id,
+        ${alias}.size_id     AS size_id,
+        ${alias}.user_id     AS user_id,
+        ${alias}.bidder_id   AS bidder_id,
+        ${alias}.type        AS type
+    </sql>
+
     <select id="getAuction" parameterType="long" resultMap="auctionResultMap">
-        SELECT A.id          AS id,
-               A.price       AS price,
-               A.created_at  AS created_at,
-               A.due_date    AS due_date,
-               A.canceled_at AS canceled_at,
-               A.signed_at   AS signed_at,
-               A.product_id  AS product_id,
-               A.size_id     AS size_id,
-               A.user_id     AS user_id,
-               A.bidder_id   AS bidder_id,
-               A.type        AS type
+        SELECT
+            <include refid="allAuctionColumns">
+                <property name="alias" value="A"/>
+            </include>
         FROM auction AS A
         WHERE A.id = #{id}
     </select>
@@ -148,6 +155,38 @@
             DESC
         </if>
         , A.size_id
+    </select>
+
+    <select id="getAuctions" parameterType="kr.flab.fream.domain.auction.AuctionSearchOption"
+        resultMap="auctionResultMap">
+        SELECT
+            <include refid="allAuctionColumns">
+                <property name="alias" value="A"/>
+            </include>
+        FROM auction A
+        WHERE product_id = #{productId}
+            <if test="sizeId != null">
+                AND size_id = #{sizeId}
+            </if>
+            <if test="lastPrice != null">
+                <choose>
+                    <when test='auctionType.name().equals("ASK")'>
+                        AND price >= #{lastPrice} AND id > #{lastAuctionId}
+                    </when>
+                    <otherwise>
+                        AND #{lastPrice} >= price AND id > #{lastAuctionId}
+                    </otherwise>
+                </choose>
+            </if>
+            AND due_date > NOW()
+            AND canceled_at IS NULL
+            AND signed_at IS NULL
+        ORDER BY price
+            <if test='auctionType.name().equals("BID")'>
+                DESC
+            </if>,
+                 id
+        LIMIT #{items}
     </select>
 
 </mapper>

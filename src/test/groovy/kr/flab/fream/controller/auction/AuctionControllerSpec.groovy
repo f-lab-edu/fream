@@ -56,7 +56,7 @@ class AuctionControllerSpec extends Specification {
     @SpringBean
     AuctionService auctionService = Stub()
 
-    @SpringBean(name = "temporaryAuthenticationResolver")
+    @SpringBean(name = "authenticationResolver")
     AbstractAuthenticationResolver authenticationResolver = Stub()
 
     @SuppressWarnings("unused")

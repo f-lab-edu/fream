@@ -19,9 +19,5 @@ public class AuthenticationResolver extends AbstractAuthenticationResolver {
             @Nonnull MethodParameter parameter, ModelAndViewContainer mavContainer,
             @Nonnull NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         return webRequest.getAttribute("userInfo", webRequest.SCOPE_SESSION);
-        /*
-        return new User(1L, "password", "user", Collections.emptyList(), "", "", null,
-                LocalDateTime.now(), null);
-         */
     }
 }

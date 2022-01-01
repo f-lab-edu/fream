@@ -1,37 +1,27 @@
 package kr.flab.fream.controller.user
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import jdk.javadoc.internal.doclets.toolkit.util.InternalException
 import kr.flab.fream.config.FormattingConfiguration
 import kr.flab.fream.config.ModelMapperConfiguration
-import kr.flab.fream.domain.auction.service.AuctionService
-import kr.flab.fream.domain.user.model.User
+import kr.flab.fream.config.WebConfig
 import kr.flab.fream.domain.user.service.UserService
-import kr.flab.fream.interceptor.LoginInterceptor
-import kr.flab.fream.mybatis.mapper.user.UserMapper
-import kr.flab.fream.mybatis.util.exception.NoAuthenticationException
-import org.apache.tomcat.jni.Status
-import org.modelmapper.ModelMapper
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.mock.web.MockHttpSession
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.MockMvcBuilder
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.server.ResponseStatusException
-import org.testcontainers.shaded.com.trilead.ssh2.Session
 import spock.lang.Specification
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(UserController)
-@Import([ObjectMapper, ModelMapperConfiguration, FormattingConfiguration, UserService])
+@Import([MappingJackson2HttpMessageConverter, ObjectMapper,ModelMapperConfiguration, FormattingConfiguration, UserService, WebConfig])
 class UserControllerSpec extends Specification {
     @Autowired
     MockMvc mockMvc;
@@ -40,64 +30,39 @@ class UserControllerSpec extends Specification {
     ObjectMapper objectMapper
 
     @SpringBean
-    UserService userService = Mock()
-
-    @Autowired
-    UserController userController
-
-    @Autowired
-    LoginInterceptor loginInterceptor
-
-
+    UserService userService = Stub()
 
 
     def "login success"() {
         given:"loginInfo"
         def requestBody = objectMapper.writeValueAsString(new LoginDto("test@test.com","1234"))
 
-        expect: "login success"
+        when:
+        userService.userLogin(_ as LoginDto) >> {LoginDto LoginInfo -> new UserDto()}
+
+        then: "login success"
         mockMvc.perform(post("/user/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
                 .andExpect(status().isOk())
 
     }
+
     /**
      * @TODO:service 레벨에서 exception을 던지고 재작성요함
      * @return
      */
-    /*
-    def "login failed"() {
-        given:"login info"
-        def requestBody = objectMapper.writeValueAsString(new LoginDto("test@test.com","12334"))
-
-        //when: "no valid input process"
-        //userService.userLogin(_ as LoginDto) >> { null }
-
-        mockMvc.perform(post("/user/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
-        then: "invoke 'not a valid input' exceptino"
-        thrown(NoAuthenticationException)
-    }
-    */
-    /**
-     * @TODO:service 레벨에서 exception을 던지고 재작성요함
-     * @return
-     */
-
     def "invalid loginInfo "() {
         given: "login info"
         def requestBody = objectMapper.writeValueAsString(new LoginDto("test@test.com","12334"))
 
-        //when: "no valid input process"
-        //userService.userLogin(_ as LoginDto) >> { throw ResponseStatusException}
-
+        when: "no valid input process"
+        userService.userLogin(_ as LoginDto) >> { throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인 정보가 유효하지 않습니다.")}
         def resultAction = mockMvc.perform(post("/user/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
 
-        expect: "invoke 'not a valid input' exceptino"
+        then: "invoke 'not a valid input'"
         resultAction.andExpect(status().isUnauthorized())
     }
 
@@ -108,11 +73,13 @@ class UserControllerSpec extends Specification {
         session.setAttribute("userInfo",userInfo);
 
         when:"processing logout"
-        mockMvc.perform(post("/user/logout").session(session))
+        def rs = mockMvc.perform(post("/user/logout").session(session))
 
         then:"logout success"
         session.isInvalid() == true
+        rs.andExpect(status().isOk())
     }
+
     /**
      * Interceptor 예외를 테스트가 받아주질 못함... ㅠ
      * @return
@@ -120,14 +87,16 @@ class UserControllerSpec extends Specification {
     def "logout failed"() {
         given:"session has not attr userinfo"
         def session = new MockHttpSession();
+        /*
         def mvc = MockMvcBuilders.standaloneSetup(userController)
                 .addInterceptors(loginInterceptor)
                 .build()
+        */
         when:"processing logout"
         def resultAction=mockMvc.perform(post("/user/logout").session(session))
 
         then: "login filed with exception 'requir" +
                 "ed userInfo' "
-        thrown(NoAuthenticationException)
+        resultAction.andExpect(status().isUnauthorized())
     }
 }

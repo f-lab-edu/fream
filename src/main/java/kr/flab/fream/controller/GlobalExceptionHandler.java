@@ -55,6 +55,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      *
      * @since 1.0.0
      */
+
     @Value
     @Builder
     public static class ErrorResponse {

@@ -30,9 +30,11 @@ public class UserService {
     }
 
     /**
+     * 사용자 로그인.
      *
      * @param loginInfo '로그인 정보'
-     * @return
+     * @return UserDto '로그인 한 유저 정보'
+     * @throws ResponseStatusException '401, 로그인 정보가 유효하지 않음, 로그인에서만 쓰여서 GlobalException을 타지 않는다.'
      */
 
     public UserDto userLogin(LoginDto loginInfo) {

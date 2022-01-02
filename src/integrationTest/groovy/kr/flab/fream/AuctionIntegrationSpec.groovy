@@ -9,6 +9,7 @@ import kr.flab.fream.mybatis.mapper.user.UserMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.http.HttpStatus
+import org.springframework.mock.web.MockHttpSession
 
 import static io.restassured.RestAssured.given
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document
@@ -32,6 +33,8 @@ class AuctionIntegrationSpec extends BaseIntegrationSpec {
 
     def "create #type"() {
         given:
+       def session = new MockHttpSession();
+       session.setAttribute("userInfo","test")
         def request = given(this.spec).contentType(ContentType.JSON).body(body)
             .filter(document(identifier))
             .log()

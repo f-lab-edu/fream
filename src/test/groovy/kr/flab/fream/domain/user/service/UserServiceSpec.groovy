@@ -43,7 +43,7 @@ class UserServiceSpec extends Specification {
         def userService = new UserService(userMapper, modelMapper)
 
         expect:
-        userService.userLogin(LoginInfo).getPassword()=="1234"
+        userService.userLogin(LoginInfo).getEmail()==LoginInfo.getEmail();
     }
 
     def"user login failed"(){

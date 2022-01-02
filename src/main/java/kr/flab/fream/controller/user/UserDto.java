@@ -29,7 +29,6 @@ import lombok.experimental.FieldDefaults;
 @Setter
 public class UserDto implements Serializable {
     Long id;
-    String password;
     String name;
     List<Address> addressBook;
     String email;

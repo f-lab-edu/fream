@@ -33,7 +33,7 @@ class AuthenticationResolverTest extends Specification {
     def "resolve an authentication"() {
         given:
         def session = new MockHttpSession();
-        def userDto = new UserDto(1l,"1234","tester",
+        def userDto = new UserDto(1l,"tester",
                 Collections.emptyList(),"test@test.com","12345678",
                 "12345678",LocalDateTime.now(),null)
         session.setAttribute("userInfo",userDto)

@@ -149,6 +149,7 @@ dependencies {
 	integrationTestImplementation 'org.spockframework:spock-junit4:2.0-groovy-3.0'
 	integrationTestImplementation 'io.rest-assured:rest-assured:4.4.0'
 	integrationTestImplementation 'org.assertj:assertj-core:3.19.0'
+	integrationTestImplementation 'org.springframework.boot:spring-boot-starter-web'
 	integrationTestImplementation(testFixtures(project))
 }
 

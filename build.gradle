@@ -98,22 +98,6 @@ jacocoTestCoverageVerification {
 test.finalizedBy jacocoTestReport
 check.dependsOn jacocoTestCoverageVerification
 
-// Seperating Integration Tests
-
-def integrationTest = sourceSets.create("integrationTest")
-
-def integrationTestTask = tasks.register("integrationTest", Test) {
-	description = 'Runs the integration tests.'
-	group = "verification"
-	testClassesDirs = integrationTest.output.classesDirs
-	classpath = integrationTest.runtimeClasspath
-	mustRunAfter(tasks.named('test'))
-}
-
-tasks.named('check') {
-	dependsOn(integrationTestTask)
-}
-
 dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -138,17 +122,6 @@ dependencies {
 	testImplementation 'org.spockframework:spock-junit4:2.0-groovy-3.0'
 	testImplementation 'org.assertj:assertj-core:3.19.0'
 
-	integrationTestImplementation 'org.springframework.boot:spring-boot-starter-test'
-	integrationTestImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:2.2.0'
-	integrationTestImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
-	integrationTestImplementation 'org.testcontainers:mysql'
-	integrationTestImplementation 'org.testcontainers:spock:1.15.3'
-	integrationTestImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
-	integrationTestImplementation 'org.spockframework:spock-spring:2.0-groovy-3.0'
-	integrationTestImplementation 'org.spockframework:spock-junit4:2.0-groovy-3.0'
-	integrationTestImplementation 'io.rest-assured:rest-assured:4.4.0'
-	integrationTestImplementation 'org.assertj:assertj-core:3.19.0'
-	integrationTestImplementation(testFixtures(project))
 }
 
 dependencyManagement {

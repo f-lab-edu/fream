@@ -3,6 +3,8 @@ package kr.flab.fream.domain.user.service;
 import kr.flab.fream.controller.user.UserDto;
 import kr.flab.fream.domain.user.model.User;
 import kr.flab.fream.mybatis.mapper.user.UserMapper;
+import kr.flab.fream.util.BcryptHelper;
+import kr.flab.fream.util.EncryptHelper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,5 +23,9 @@ public class UserService {
 
     public UserDto getUser(Long id) {
         return modelMapper.map(userMapper.getUser(id), UserDto.class);
+    }
+    public int signUpMember(UserDto userInfo){
+        userInfo.setPassword(BcryptHelper. userInfo.getPassword());
+        return 1;
     }
 }

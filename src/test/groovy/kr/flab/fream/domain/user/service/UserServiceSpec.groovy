@@ -63,4 +63,19 @@ class UserServiceSpec extends Specification {
         thrown(ResponseStatusException)
 
     }
+
+    def "joinUser"(){
+        given:
+        def user = new User();
+        def modelMapper = new ModelMapperConfiguration().modelMapper();
+
+        UserMapper userMapper = Stub() {
+            joinUser(_ as User) >> { User userInfo -> 1}
+        }
+
+        def userService = new UserService(userMapper, modelMapper)
+
+        expect:
+        1 == userService.signUpMember(user);
+    }
 }

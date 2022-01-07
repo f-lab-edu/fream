@@ -1,7 +1,8 @@
 package kr.flab.fream.util;
 
-public interface EncryptHelper {
-    String static encryptPassword(String password){
+import org.springframework.stereotype.Component;
 
-    }
+
+public interface EncryptHelper {
+    String encryptPassword(String password);
 }

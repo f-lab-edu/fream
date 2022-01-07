@@ -26,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserService {
     private final UserMapper userMapper;
     private final ModelMapper modelMapper;
+    //private final EncryptHelper encryptHelper;
 
     public UserDto getUserById(Long id) {
         return modelMapper.map(userMapper.getUserById(id), UserDto.class);
@@ -45,8 +46,15 @@ public class UserService {
         }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인 정보가 유효하지 않습니다.");
     }
-    public int signUpMember(UserDto userInfo){
-        userInfo.setPassword(BcryptHelper. userInfo.getPassword());
-        return 1;
+
+    /**
+     * 회원가입.
+     * @param userInfo '회원정보'
+     * @return '1 if success'
+     */
+    public int signUpMember(User userInfo){
+        EncryptHelper encryptHelper = new BcryptHelper();
+        userInfo.setPassword(encryptHelper.encryptPassword(userInfo.getPassword()));
+        return userMapper.joinUser(userInfo);
     }
 }

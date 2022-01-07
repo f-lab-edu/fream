@@ -1,16 +1,21 @@
 package kr.flab.fream.auth
 
 import kr.flab.fream.config.WebConfig
+import kr.flab.fream.controller.user.UserDto
+import kr.flab.fream.domain.user.model.Address
 import kr.flab.fream.domain.user.model.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
+import org.springframework.mock.web.MockHttpSession
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import spock.lang.Specification
+
+import java.time.LocalDateTime
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -27,7 +32,13 @@ class AuthenticationResolverTest extends Specification {
 
     def "resolve an authentication"() {
         given:
-        def resultActions = mockMvc.perform(post("/authTest"))
+        def session = new MockHttpSession();
+        def userDto = new UserDto(1l,"tester",
+                Collections.emptyList(),"test@test.com","12345678",
+                "12345678",LocalDateTime.now(),null)
+        session.setAttribute("userInfo",userDto)
+
+        def resultActions = mockMvc.perform(post("/authTest").session(session))
 
         expect:
         resultActions.andExpect(status().is(HttpStatus.OK.value()))
@@ -42,7 +53,7 @@ class AuthenticationResolverTest extends Specification {
     private static class TestController {
 
         @PostMapping
-        TestDto post(@Authentication User user) {
+        TestDto post(@Authentication UserDto user) {
             return new TestDto(user.getId())
         }
 

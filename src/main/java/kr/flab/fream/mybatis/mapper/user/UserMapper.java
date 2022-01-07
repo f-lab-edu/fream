@@ -1,5 +1,7 @@
 package kr.flab.fream.mybatis.mapper.user;
 
+import kr.flab.fream.controller.user.LoginDto;
+import kr.flab.fream.controller.user.UserDto;
 import kr.flab.fream.domain.user.model.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
@@ -12,7 +14,9 @@ import org.springframework.stereotype.Repository;
 @Mapper
 public interface UserMapper {
 
-    User getUser(Long id);
+    User getUserById(Long id);
+
+    User getUser(LoginDto loginInfo);
 
     int joinUser(User user);
 

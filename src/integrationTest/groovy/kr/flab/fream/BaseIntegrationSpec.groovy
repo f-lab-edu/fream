@@ -5,6 +5,7 @@ import io.restassured.builder.RequestSpecBuilder
 import io.restassured.specification.RequestSpecification
 import org.junit.Rule
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.mock.web.MockHttpSession
 import org.springframework.restdocs.JUnitRestDocumentation
 
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint

@@ -48,11 +48,12 @@ public class UserService {
     }
 
     /**
-     * 회원가입.
+     * 사용자가 회원가입을 한다.
+     *
      * @param userInfo '회원정보'
      * @return '1 if success'
      */
-    public int signUpMember(User userInfo){
+    public int signUpMember(User userInfo) {
         EncryptHelper encryptHelper = new BcryptHelper();
         userInfo.setPassword(encryptHelper.encryptPassword(userInfo.getPassword()));
         return userMapper.joinUser(userInfo);

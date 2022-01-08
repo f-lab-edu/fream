@@ -2,6 +2,8 @@ package kr.flab.fream.domain.user.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -25,11 +27,15 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode
 public class User {
     Long id;
+    @NotNull
     String password;
+    @NotNull
     String name;
     List<Address> addressBook;
     String phone;
+    @NotNull
     String account;
+    @Email
     String email;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;

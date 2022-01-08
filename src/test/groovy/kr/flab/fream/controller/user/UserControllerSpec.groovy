@@ -113,6 +113,7 @@ class UserControllerSpec extends Specification {
         def requestBody = objectMapper.writeValueAsString(user)
 
         when:"processing logout"
+        userService.userLogin(_ as User) >> {User userInfo -> 1}
         def resultAction=mockMvc.perform(post("/user/join")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
@@ -128,7 +129,7 @@ class UserControllerSpec extends Specification {
         user.setAccount("test");
 
         def requestBody = objectMapper.writeValueAsString(user)
-
+        userService.signUpMember(_ as User) >> {User userInfo -> 1}
         when:"processing logout"
         def resultAction=mockMvc.perform(post("/user/join")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -136,6 +137,6 @@ class UserControllerSpec extends Specification {
 
         then: "login filed with exception 'requir" +
                 "ed userInfo' "
-        resultAction.andExpect(status().isUnauthorized())
+        resultAction.andExpect(status().isBadRequest())
     }
 }

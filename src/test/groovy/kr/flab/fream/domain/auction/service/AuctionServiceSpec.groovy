@@ -2,7 +2,8 @@ package kr.flab.fream.domain.auction.service
 
 import kr.flab.domain.auction.AuctionFixtures
 import kr.flab.domain.product.ProductFixtures
-import kr.flab.fream.controller.auction.AuctionDto
+import kr.flab.fream.config.ModelMapperConfiguration
+import kr.flab.fream.controller.auction.AuctionPatchRequest
 import kr.flab.fream.controller.auction.AuctionRequest
 import kr.flab.fream.domain.auction.AuctionSearchOption
 import kr.flab.fream.domain.auction.dto.SignAuctionResponse
@@ -15,40 +16,39 @@ import kr.flab.fream.mybatis.mapper.auction.AuctionMapper
 import kr.flab.fream.mybatis.mapper.user.UserMapper
 import kr.flab.user.UserFixtures
 import org.modelmapper.ModelMapper
-import org.spockframework.spring.SpringBean
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
 
+import java.time.Duration
 import java.time.LocalDateTime
 import java.util.stream.Collectors
 
 import static org.assertj.core.api.Assertions.assertThat
 
-@SpringBootTest(classes = [AuctionService, ModelMapper])
 class AuctionServiceSpec extends Specification {
 
     private static Product targetProduct = ProductFixtures.getNikeDunkLowRetroBlack()
 
-    @SpringBean
-    AuctionMapper auctionMapper = Stub() {
-    }
+    AuctionMapper auctionMapper
 
-    @SpringBean
-    UserMapper userMapper = Stub() {
-        getUser(_ as Long) >> { Long id -> new User(id) }
-    }
+    UserMapper userMapper
 
-    @SpringBean
-    ProductService productService = Stub() {
-        getProduct(_ as Long) >> targetProduct
-    }
+    ProductService productService
 
-    @Autowired
-    ModelMapper modelMapper
+    ModelMapper modelMapper = new ModelMapperConfiguration().modelMapper()
 
-    @Autowired
     AuctionService sut
+
+    void setup() {
+        productService = Stub()
+        productService.getProduct(_ as Long) >> targetProduct
+
+        userMapper = Stub()
+        userMapper.getUser(_ as Long) >> { Long id -> new User(id) }
+
+        auctionMapper = Stub()
+
+        sut = new AuctionService(auctionMapper, userMapper, productService, modelMapper)
+    }
 
     def "throw IllegalArgumentException if product does not have a given size"() {
         given:
@@ -70,7 +70,12 @@ class AuctionServiceSpec extends Specification {
         def auction = sut.createAuction(request)
 
         then:
-        auction == modelMapper.map(targetProduct, AuctionDto.getTypeObject())
+        auction.price == new BigDecimal("100000")
+        auction.product.id == 1L
+        auction.product.name == targetProduct.name
+        auction.sizeName == targetProduct.sizes.getSize(1L).name
+        assertThat(Duration.between(LocalDateTime.now(), auction.dueDate).toDays())
+            .isBetween(59L, 60L)
 
         where:
         type << [AuctionType.ASK, AuctionType.BID]
@@ -114,6 +119,32 @@ class AuctionServiceSpec extends Specification {
                 new BigDecimal("287000"),
                 new BigDecimal("289000"),
             ])
+    }
+
+    def "update an auction"() {
+        given:
+        auctionMapper.getAuction(_ as Long) >> auction()
+        def originDate = auction().dueDate
+        def request = new AuctionPatchRequest(new BigDecimal("150000"), 30);
+
+        when:
+        def result = sut.update(1L, request)
+
+        then:
+        result.getPrice() == request.price
+        Duration.between(result.dueDate, originDate).toDays() <= 30L
+    }
+
+    def "cancel an auction"() {
+        given:
+        def targetAuction = auction()
+        auctionMapper.getAuction(targetProduct.id as Long) >> targetAuction
+
+        when:
+        sut.cancel(targetProduct.id)
+
+        then:
+        noExceptionThrown()
     }
 
     private static def auction() {

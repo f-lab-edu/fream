@@ -303,12 +303,15 @@ class AuctionControllerSpec extends Specification {
 
     def "return 204 when canceling an auction"() {
         given:
+        def session = new MockHttpSession();
+        session.setAttribute("userInfo","test")
+
         def builder = delete(url as String + "/1")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
 
         when:
-        def resultActions = mockMvc.perform(builder)
+        def resultActions = mockMvc.perform(builder.session(session))
 
         then:
         resultActions.andExpect(status().is(HttpStatus.NO_CONTENT.value()))
@@ -319,6 +322,9 @@ class AuctionControllerSpec extends Specification {
 
     def "return 400 if input values wrong when requesting modify an auction"() {
         given:
+        def session = new MockHttpSession();
+        session.setAttribute("userInfo","test")
+
         def id = 1L
 
         def builder = patch(url as String + "/" + id)
@@ -327,7 +333,7 @@ class AuctionControllerSpec extends Specification {
             .accept(MediaType.APPLICATION_JSON)
 
         when:
-        def resultActions = mockMvc.perform(builder)
+        def resultActions = mockMvc.perform(builder.session(session))
 
         then:
         resultActions.andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -347,6 +353,9 @@ class AuctionControllerSpec extends Specification {
 
     def "return 200 when requesting modify an auction with valid inputs"() {
         given:
+        def session = new MockHttpSession();
+        session.setAttribute("userInfo","test")
+
         def id = 1L
 
         def builder = patch(url as String + "/" + id)
@@ -357,7 +366,7 @@ class AuctionControllerSpec extends Specification {
         auctionService.update(_ as Long, _ as AuctionPatchRequest) >> null
 
         when:
-        def resultActions = mockMvc.perform(builder)
+        def resultActions = mockMvc.perform(builder.session(session))
 
         then:
         resultActions.andExpect(status().is(HttpStatus.OK.value()))

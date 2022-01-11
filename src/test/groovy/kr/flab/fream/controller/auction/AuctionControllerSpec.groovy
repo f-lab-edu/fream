@@ -35,7 +35,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -299,5 +301,123 @@ class AuctionControllerSpec extends Specification {
         ].combinations()
     }
 
+    def "return 204 when canceling an auction"() {
+        given:
+        def session = new MockHttpSession();
+        session.setAttribute("userInfo","test")
+
+        def builder = delete(url as String + "/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+
+        when:
+        def resultActions = mockMvc.perform(builder.session(session))
+
+        then:
+        resultActions.andExpect(status().is(HttpStatus.NO_CONTENT.value()))
+
+        where:
+        url << ["/auction/asks", "/auction/bids"]
+    }
+
+    def "return 400 if input values wrong when requesting modify an auction"() {
+        given:
+        def session = new MockHttpSession();
+        session.setAttribute("userInfo","test")
+
+        def id = 1L
+
+        def builder = patch(url as String + "/" + id)
+            .content(objectMapper.writeValueAsString(requestBody))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+
+        when:
+        def resultActions = mockMvc.perform(builder.session(session))
+
+        then:
+        resultActions.andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+
+        where:
+        [url, requestBody] << [
+            ["/auction/asks", "/auction/bids"],
+            [
+                new AuctionPatchRequest(null, 1),
+                new AuctionPatchRequest(new BigDecimal("100000"), null),
+                new AuctionPatchRequest(new BigDecimal("-1"), 1),
+                new AuctionPatchRequest(new BigDecimal("100000"), 0),
+                new AuctionPatchRequest(new BigDecimal("100000"), 61)
+            ]
+        ].combinations()
+    }
+
+    def "return 200 when requesting modify an auction with valid inputs"() {
+        given:
+        def session = new MockHttpSession();
+        session.setAttribute("userInfo","test")
+
+        def id = 1L
+
+        def builder = patch(url as String + "/" + id)
+            .content(objectMapper.writeValueAsString(requestBody))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+
+        auctionService.update(_ as Long, _ as AuctionPatchRequest) >> null
+
+        when:
+        def resultActions = mockMvc.perform(builder.session(session))
+
+        then:
+        resultActions.andExpect(status().is(HttpStatus.OK.value()))
+
+        where:
+        [url, requestBody] << [
+            ["/auction/asks", "/auction/bids"],
+            [
+                new AuctionPatchRequest(new BigDecimal("100000"), 1),
+            ]
+        ].combinations()
+    }
+
+    def "return 400 if product ID is null when getting auction summaries"() {
+        given:
+        def builder = get(url as String)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+
+        auctionService.getAuctionSummaries(_ as AuctionType, _ as Long, _ as Long, _ as BigDecimal)
+            >> new ArrayList<AuctionSummaryByPriceAndSizeWithQuantity>()
+
+        when:
+        def resultActions = mockMvc.perform(builder)
+
+        then:
+        resultActions.andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+
+        where:
+        url << ["/auction/asks/summaries", "/auction/bids/summaries"]
+    }
+
+    def "return 200 if get auction summaries"() {
+        given:
+        def builder = get(url as String)
+            .param("productId", "1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+
+        auctionService.getAuctionSummaries(_ as AuctionType, _ as Long, _ as Long, _ as BigDecimal)
+            >> new ArrayList<AuctionSummaryByPriceAndSizeWithQuantity>()
+
+        when:
+        def resultActions = mockMvc.perform(builder)
+
+        then:
+        resultActions.andExpect(status().is(HttpStatus.OK.value()))
+
+        where:
+        url << ["/auction/asks/summaries", "/auction/bids/summaries"]
+    }
+    
 }
 

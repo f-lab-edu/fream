@@ -89,6 +89,28 @@ class ProductControllerSpec extends Specification {
             return getNikeProducts()
         }
     }
+    
+    def "return 200 and sort by OrderOption"() {
+        given:
+        def request = get("/products")
+            .param("orderOption", orderOption.name())
+
+        when:
+        def resultActions = mockMvc.perform(request)
+
+        then:
+        resultActions.andExpect(status().is(HttpStatus.OK.value()))
+
+        and:
+        1 * productService.search(_) >> {
+            def searchOption = (it as List<?>)[0] as SearchOption
+            assert searchOption.orderOption == orderOption
+            return getNikeProducts()
+        }
+
+        where:
+        orderOption << [OrderOption.POPULAR, OrderOption.RECENTLY_RELEASED]
+    }
 
     def "return 400 If parameters are invalid when requesting Product List - '#testcase'"() {
         def resultActions = mockMvc.perform(request)

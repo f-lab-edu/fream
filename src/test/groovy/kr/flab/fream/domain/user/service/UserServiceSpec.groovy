@@ -5,6 +5,7 @@ import kr.flab.fream.controller.user.LoginDto
 import kr.flab.fream.controller.user.UserDto
 import kr.flab.fream.domain.user.model.User
 import kr.flab.fream.mybatis.mapper.user.UserMapper
+import kr.flab.fream.util.EncryptHelper
 import org.modelmapper.ModelMapper
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,7 +28,11 @@ class UserServiceSpec extends Specification {
             getUserById(_ as Long) >> { Long id -> new User(id) }
         }
 
-        def userService = new UserService(userMapper, modelMapper)
+        EncryptHelper encryptHelper = Stub(){
+            encryptPassword(_ as String) >> { String plainPassword -> org.mindrot.jbcrypt.BCrypt.hashpw(plainPassword)}
+        }
+
+        def userService = new UserService(userMapper, modelMapper, encryptHelper)
         expect:
         userService.getUserById(1L).getId()==1L;
     }
@@ -39,8 +44,12 @@ class UserServiceSpec extends Specification {
         UserMapper userMapper = Stub() {
             getUser(_ as LoginDto) >> { LoginDto LoginInfo -> new User(LoginInfo.getEmail(),LoginInfo.getPassword())}
         }
+        EncryptHelper encryptHelper = Stub(){
+            encryptPassword(_ as String) >> { String plainPassword -> org.mindrot.jbcrypt.BCrypt.hashpw(plainPassword)}
+        }
+
         LoginDto LoginInfo = new LoginDto("test@test.com","1234");
-        def userService = new UserService(userMapper, modelMapper)
+        def userService = new UserService(userMapper, modelMapper,encryptHelper)
 
         expect:
         userService.userLogin(LoginInfo).getEmail()==LoginInfo.getEmail();
@@ -53,8 +62,13 @@ class UserServiceSpec extends Specification {
         UserMapper userMapper = Stub() {
             getUser(_ as LoginDto) >> { null}
         }
+
+        EncryptHelper encryptHelper = Stub(){
+            encryptPassword(_ as String) >> { String plainPassword -> org.mindrot.jbcrypt.BCrypt.hashpw(plainPassword)}
+        }
+
         LoginDto loginInfo = new LoginDto("test@test.com","1234");
-        def userService = new UserService(userMapper, modelMapper)
+        def userService = new UserService(userMapper, modelMapper, encryptHelper)
 
         when:
         userService.userLogin(loginInfo)
@@ -69,11 +83,15 @@ class UserServiceSpec extends Specification {
         def user = new User();
         def modelMapper = new ModelMapperConfiguration().modelMapper();
 
+        EncryptHelper encryptHelper = Stub(){
+            encryptPassword(_ as String) >> { String plainPassword -> org.mindrot.jbcrypt.BCrypt.hashpw(plainPassword)}
+        }
+
         UserMapper userMapper = Stub() {
             joinUser(_ as User) >> { User userInfo -> 1}
         }
 
-        def userService = new UserService(userMapper, modelMapper)
+        def userService = new UserService(userMapper, modelMapper, encryptHelper)
 
         expect:
         1 == userService.signUpMember(user);

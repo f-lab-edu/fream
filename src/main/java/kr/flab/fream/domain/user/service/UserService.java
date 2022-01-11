@@ -26,7 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserService {
     private final UserMapper userMapper;
     private final ModelMapper modelMapper;
-    //private final EncryptHelper encryptHelper;
+    private final EncryptHelper encryptHelper;
 
     public UserDto getUserById(Long id) {
         return modelMapper.map(userMapper.getUserById(id), UserDto.class);
@@ -54,7 +54,6 @@ public class UserService {
      * @return '1 if success'
      */
     public int signUpMember(User userInfo) {
-        EncryptHelper encryptHelper = new BcryptHelper();
         userInfo.setPassword(encryptHelper.encryptPassword(userInfo.getPassword()));
         return userMapper.joinUser(userInfo);
     }

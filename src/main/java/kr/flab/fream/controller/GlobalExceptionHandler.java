@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import kr.flab.fream.mybatis.util.exception.NoAuthenticationException;
 import lombok.Builder;
 import lombok.Value;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -49,16 +50,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(errorResponse, httpStatus);
     }
-
     /**
      * 글로벌 예외가 발생할 때 사용할 DTO 객체.
      *
      * @since 1.0.0
      */
+
     @Value
     @Builder
     public static class ErrorResponse {
-
         LocalDateTime timestamp;
         Integer status;
         String error;

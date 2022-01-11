@@ -1,10 +1,18 @@
 package kr.flab.fream.mybatis.mapper.user
 
 import kr.flab.fream.DatabaseTest
+import kr.flab.fream.controller.user.LoginDto
+import kr.flab.fream.controller.user.UserDto
 import kr.flab.fream.domain.user.model.User
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
+import org.springframework.mock.web.MockHttpSession
+
+import javax.servlet.ServletContext
+import javax.servlet.http.HttpSession
+import javax.servlet.http.HttpSessionContext
+import java.net.http.HttpRequest
 
 @MybatisTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -26,7 +34,7 @@ class UserMapperSpec extends DatabaseTest {
         userMapper.updateUser(user);
 
         expect:
-        userMapper.getUser(1L).getPassword() == "ggggg"
+        userMapper.getUserById(1L).getPassword() == "ggggg"
     }
 
     def "add user"() {
@@ -42,9 +50,18 @@ class UserMapperSpec extends DatabaseTest {
         userMapper.joinUser(user) == 1
     }
 
-    def "get user"() {
+    def "get user by id"() {
         expect:
-        userMapper.getUser(1L).getAddressBook().size() == 3
+        userMapper.getUserById(1L).getAddressBook().size() == 3
+    }
+
+    def "get user"() {
+        given:
+        LoginDto loginInfo = new LoginDto();
+        loginInfo.setEmail("test@test2.com");
+        loginInfo.setPassword("1234");
+        expect:
+        userMapper.getUser(loginInfo).getAddressBook().size()==1
     }
 
     def "delete user"() {
@@ -56,4 +73,6 @@ class UserMapperSpec extends DatabaseTest {
         expect:
         userMapper.deleteUser(user) == 1
     }
+
+
 }

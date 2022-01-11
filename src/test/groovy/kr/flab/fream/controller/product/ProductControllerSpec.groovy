@@ -1,5 +1,6 @@
 package kr.flab.fream.controller.product
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import kr.flab.fream.config.FormattingConfiguration
 import kr.flab.fream.config.ModelMapperConfiguration
 import kr.flab.fream.domain.product.OrderOption
@@ -10,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.test.web.servlet.MockMvc
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
 import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
@@ -24,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(ProductController)
-@Import([ObjectMapper, ModelMapperConfiguration, FormattingConfiguration])
+@Import([ObjectMapper, MappingJackson2HttpMessageConverter, ModelMapperConfiguration, FormattingConfiguration])
 class ProductControllerSpec extends Specification {
 
     @Autowired

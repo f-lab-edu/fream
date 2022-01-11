@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.core.MethodParameter
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.mock.web.MockHttpSession
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.util.LinkedMultiValueMap
@@ -58,7 +59,7 @@ class AuctionControllerSpec extends Specification {
     @SpringBean
     AuctionService auctionService = Stub()
 
-    @SpringBean(name = "temporaryAuthenticationResolver")
+    @SpringBean(name = "authenticationResolver")
     AbstractAuthenticationResolver authenticationResolver = Stub()
 
     @SuppressWarnings("unused")
@@ -69,7 +70,9 @@ class AuctionControllerSpec extends Specification {
 
     def "return 400 invalid AuctionRequest '#testcase'"() {
         given:
-        def resultActions = mockMvc.perform(post(ASK_URL).contentType(MediaType.APPLICATION_JSON)
+        def session = new MockHttpSession();
+        session.setAttribute("userInfo","test")
+        def resultActions = mockMvc.perform(post(ASK_URL).session(session).contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(requestBody)))
 
         expect:
@@ -100,6 +103,8 @@ class AuctionControllerSpec extends Specification {
 
     def "return 200 with valid creating '#type' request"() {
         given:
+        def session = new MockHttpSession();
+        session.setAttribute("userInfo","test")
         def auctionRequest = new AuctionRequest(new BigDecimal(100_000), 1, 1, 1, 1, type)
         def auction = type.constructor.apply(auctionRequest)
         def product = ProductFixtures.getNikeDunkLowRetroBlack()
@@ -112,6 +117,7 @@ class AuctionControllerSpec extends Specification {
 
         when:
         def resultActions = mockMvc.perform(post(url)
+            .session(session)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(auctionRequest)))
 
@@ -141,6 +147,8 @@ class AuctionControllerSpec extends Specification {
 
     def "return 400 if invalid update request - #url, #request.second"() {
         given:
+        def session = new MockHttpSession();
+        session.setAttribute("userInfo","test")
         String targetUrl = url + "/1"
         AuctionPatchRequest patchRequest = (request as Tuple2<AuctionPatchRequest, String>).getV1()
 
@@ -149,7 +157,7 @@ class AuctionControllerSpec extends Specification {
             .content(objectMapper.writeValueAsString(patchRequest))
 
         when:
-        def resultActions = mockMvc.perform(builder)
+        def resultActions = mockMvc.perform(builder.session(session))
 
         then:
         resultActions.andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -170,7 +178,8 @@ class AuctionControllerSpec extends Specification {
     def "return 401 if there is no authentication when signing to the auction"() {
         given:
         String targetUrl = url + "/1/sign"
-
+        def session = new MockHttpSession();
+        session.setAttribute("userInfo","test")
         def builder = post(targetUrl)
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
@@ -179,7 +188,7 @@ class AuctionControllerSpec extends Specification {
             _ as NativeWebRequest, _ as WebDataBinderFactory) >> null
 
         when:
-        def resultActions = mockMvc.perform(builder)
+        def resultActions = mockMvc.perform(builder.session(session))
 
         then:
         resultActions.andExpect(status().is(HttpStatus.UNAUTHORIZED.value()))
@@ -191,7 +200,8 @@ class AuctionControllerSpec extends Specification {
     def "return 200 when signing to the auction"() {
         given:
         String targetUrl = url + "/1/sign"
-
+        def session = new MockHttpSession();
+        session.setAttribute("userInfo","test")
         def builder = post(targetUrl)
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
@@ -202,7 +212,7 @@ class AuctionControllerSpec extends Specification {
         auctionService.sign(_ as User, 1L) >> new SignAuctionResponse(1L, LocalDateTime.now())
 
         when:
-        def resultActions = mockMvc.perform(builder)
+        def resultActions = mockMvc.perform(builder.session(session))
 
         then:
         resultActions.andExpect(status().is(HttpStatus.OK.value()))
@@ -214,7 +224,6 @@ class AuctionControllerSpec extends Specification {
     def "return 400 if the product id not specified"() {
         given:
         String targetUrl = url + "/summaries"
-
         def builder = get(targetUrl)
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
@@ -294,12 +303,15 @@ class AuctionControllerSpec extends Specification {
 
     def "return 204 when canceling an auction"() {
         given:
+        def session = new MockHttpSession();
+        session.setAttribute("userInfo","test")
+
         def builder = delete(url as String + "/1")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
 
         when:
-        def resultActions = mockMvc.perform(builder)
+        def resultActions = mockMvc.perform(builder.session(session))
 
         then:
         resultActions.andExpect(status().is(HttpStatus.NO_CONTENT.value()))
@@ -310,6 +322,9 @@ class AuctionControllerSpec extends Specification {
 
     def "return 400 if input values wrong when requesting modify an auction"() {
         given:
+        def session = new MockHttpSession();
+        session.setAttribute("userInfo","test")
+
         def id = 1L
 
         def builder = patch(url as String + "/" + id)
@@ -318,7 +333,7 @@ class AuctionControllerSpec extends Specification {
             .accept(MediaType.APPLICATION_JSON)
 
         when:
-        def resultActions = mockMvc.perform(builder)
+        def resultActions = mockMvc.perform(builder.session(session))
 
         then:
         resultActions.andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -338,6 +353,9 @@ class AuctionControllerSpec extends Specification {
 
     def "return 200 when requesting modify an auction with valid inputs"() {
         given:
+        def session = new MockHttpSession();
+        session.setAttribute("userInfo","test")
+
         def id = 1L
 
         def builder = patch(url as String + "/" + id)
@@ -348,7 +366,7 @@ class AuctionControllerSpec extends Specification {
         auctionService.update(_ as Long, _ as AuctionPatchRequest) >> null
 
         when:
-        def resultActions = mockMvc.perform(builder)
+        def resultActions = mockMvc.perform(builder.session(session))
 
         then:
         resultActions.andExpect(status().is(HttpStatus.OK.value()))
@@ -402,3 +420,4 @@ class AuctionControllerSpec extends Specification {
     }
     
 }
+

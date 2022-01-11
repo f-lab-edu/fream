@@ -1,5 +1,6 @@
 package kr.flab.fream.controller.user;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import kr.flab.fream.domain.user.model.Address;
@@ -26,9 +27,8 @@ import lombok.experimental.FieldDefaults;
 @ToString
 @EqualsAndHashCode
 @Setter
-public class UserDto {
+public class UserDto implements Serializable {
     Long id;
-    String password;
     String name;
     List<Address> addressBook;
     String email;

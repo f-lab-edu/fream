@@ -3,7 +3,7 @@ spring:
     schemas: fream
     locations:
       - classpath:db/migration
-      - classpath:db/migration-seed
+      - classpath:db/migration-prod-seed
 mybatis:
   configuration:
     map-underscore-to-camel-case: true

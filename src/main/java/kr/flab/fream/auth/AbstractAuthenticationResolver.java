@@ -1,6 +1,7 @@
 package kr.flab.fream.auth;
 
 import org.springframework.core.MethodParameter;
+import org.springframework.stereotype.Component;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 
 /**
@@ -9,6 +10,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
  * @since 1.0.0
  * @author Jake
  */
+@Component
 public abstract class AbstractAuthenticationResolver implements HandlerMethodArgumentResolver {
 
     @Override

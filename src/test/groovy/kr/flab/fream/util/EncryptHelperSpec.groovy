@@ -15,4 +15,15 @@ class EncryptHelperSpec extends Specification {
         then:
         hashStr1 != hashStr2
     }
+
+    def "check password test"() {
+        given:
+        EncryptHelper encryptHelper = new BcryptHelper();
+
+        when:
+        String hashStr = encryptHelper.encryptPassword("1234");
+
+        then:
+        encryptHelper.comparePassword("1234",hashStr) == true
+    }
 }

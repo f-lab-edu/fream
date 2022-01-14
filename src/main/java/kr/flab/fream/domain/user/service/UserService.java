@@ -41,8 +41,11 @@ public class UserService {
      */
 
     public UserDto userLogin(LoginDto loginInfo) {
-        if (!ObjectUtils.isEmpty(userMapper.getUser(loginInfo))) {
-            return modelMapper.map(userMapper.getUser(loginInfo), UserDto.class);
+        User userInfo = userMapper.getUser(loginInfo);
+        if (!ObjectUtils.isEmpty(userInfo)) {
+            if (encryptHelper.comparePassword(loginInfo.getPassword(), userInfo.getPassword())) {
+                return modelMapper.map(userInfo, UserDto.class);
+            }
         }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인 정보가 유효하지 않습니다.");
     }

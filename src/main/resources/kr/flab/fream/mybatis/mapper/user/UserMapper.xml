@@ -49,11 +49,10 @@
                a.address AS address,
                a.address_detail AS address_detail,
                a.is_default AS is_default,
-               a.alias AS alias
+          a.alias AS a
         FROM  user AS u
                   JOIN address AS a ON u.id = a.user_id
         WHERE u.email = #{email}
-            And u.password = #{password}
     </select>
 
     <insert id="joinUser"  keyProperty="id"   parameterType="kr.flab.fream.domain.user.model.User"   useGeneratedKeys="true">

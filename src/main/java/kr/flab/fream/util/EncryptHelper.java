@@ -8,4 +8,6 @@ import org.springframework.stereotype.Component;
 public abstract class EncryptHelper {
 
     public abstract String encryptPassword(String password);
+
+    public abstract Boolean comparePassword(String plainPassword, String encPassword);
 }

@@ -19,4 +19,9 @@ public class BcryptHelper extends EncryptHelper {
     public String encryptPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
+
+    @Override
+    public Boolean comparePassword(String plainPassword, String encPassword) {
+        return BCrypt.checkpw(plainPassword, encPassword);
+    }
 }

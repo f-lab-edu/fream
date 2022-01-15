@@ -1,32 +1,15 @@
 package kr.flab.fream.domain.auction.service
 
-import kr.flab.domain.auction.AuctionFixtures
-import kr.flab.domain.product.ProductFixtures
-import kr.flab.fream.DatabaseClearConfig
-import kr.flab.fream.DatabaseTest
+
 import kr.flab.fream.IntegrationSpec
-import kr.flab.fream.config.ModelMapperConfiguration
-import kr.flab.fream.controller.auction.AuctionDto
-import kr.flab.fream.controller.auction.AuctionPatchRequest
 import kr.flab.fream.controller.auction.AuctionRequest
 import kr.flab.fream.controller.auction.AuctionSummaryByPriceAndSizeWithQuantity
-import kr.flab.fream.domain.auction.AuctionSearchOption
-import kr.flab.fream.domain.auction.dto.SignAuctionResponse
-import kr.flab.fream.domain.auction.model.Ask
 import kr.flab.fream.domain.auction.model.AuctionType
-import kr.flab.fream.domain.product.model.Product
-import kr.flab.fream.domain.product.service.ProductService
-import kr.flab.fream.domain.user.model.User
 import kr.flab.fream.mybatis.mapper.auction.AuctionMapper
 import kr.flab.fream.mybatis.mapper.user.UserMapper
 import org.modelmapper.ModelMapper
-import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.annotation.Import
 import org.springframework.test.context.jdbc.Sql
-import org.springframework.transaction.annotation.Transactional
 
 import static org.assertj.core.api.Assertions.assertThat
 
@@ -40,6 +23,9 @@ class AuctionServiceIntegrationSpec extends IntegrationSpec {
 
     @Autowired
     AuctionService sut
+
+    @Autowired
+    UserMapper userMapper
 
     @Sql("/db-test-data/auction/get-ask-summaries.sql")
     def "get ASK summaries"() {
@@ -102,6 +88,36 @@ class AuctionServiceIntegrationSpec extends IntegrationSpec {
                 new AuctionSummaryByPriceAndSizeWithQuantity("265", new BigDecimal("495000.00"), 1, AuctionType.BID),
             ),
         ]
+    }
+
+    def "create an auction"() {
+        given:
+        def request = new AuctionRequest(
+            new BigDecimal("100000"),
+            1,
+            1,
+            1,
+            30,
+             AuctionType.ASK
+        )
+
+        when:
+        def response = sut.createAuction(request)
+
+        then:
+        response != null
+    }
+
+    def "sign an auction"() {
+        given:
+        def user = userMapper.getUserById(2)
+        def auctionId = 1L
+
+        when:
+        def response = sut.sign(user, auctionId)
+
+        then:
+        response != null
     }
 
 }

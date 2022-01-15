@@ -87,7 +87,7 @@ public class Auction {
      * 입찰 완료 처리한다.
      */
     public void sign(User bidder) {
-        if (Objects.equals(this.user.getId(), bidder.getId())) {
+        if (Objects.equals(this.getUser().getId(), bidder.getId())) {
             throw new IllegalArgumentException("직접 등록한 입찰에 참여할 수 없습니다.");
         }
         state.finish(this);

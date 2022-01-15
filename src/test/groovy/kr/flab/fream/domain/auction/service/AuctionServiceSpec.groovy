@@ -5,6 +5,7 @@ import kr.flab.domain.product.ProductFixtures
 import kr.flab.fream.config.ModelMapperConfiguration
 import kr.flab.fream.controller.auction.AuctionPatchRequest
 import kr.flab.fream.controller.auction.AuctionRequest
+import kr.flab.fream.domain.auction.AuctionLockManager
 import kr.flab.fream.domain.auction.AuctionSearchOption
 import kr.flab.fream.domain.auction.dto.SignAuctionResponse
 import kr.flab.fream.domain.auction.model.Ask
@@ -36,6 +37,8 @@ class AuctionServiceSpec extends Specification {
 
     ModelMapper modelMapper = new ModelMapperConfiguration().modelMapper()
 
+    AuctionLockManager lockManager
+
     AuctionService sut
 
     void setup() {
@@ -47,7 +50,9 @@ class AuctionServiceSpec extends Specification {
 
         auctionMapper = Stub()
 
-        sut = new AuctionService(auctionMapper, userMapper, productService, modelMapper)
+        lockManager = Stub()
+
+        sut = new AuctionService(auctionMapper, userMapper, productService, modelMapper, lockManager)
     }
 
     def "throw IllegalArgumentException if product does not have a given size"() {
@@ -87,6 +92,7 @@ class AuctionServiceSpec extends Specification {
         def targetAuction = auction()
         def auctionId = targetAuction.getId()
 
+        auctionMapper.getAuction(auctionId) >> targetAuction
         auctionMapper.getAuctionForUpdate(auctionId) >> targetAuction
 
         when:
@@ -152,6 +158,7 @@ class AuctionServiceSpec extends Specification {
 
         auction.user = UserFixtures.firstUser()
         auction.product = targetProduct
+        auction.size = targetProduct.sizes.sizeList[0]
 
         return auction
     }

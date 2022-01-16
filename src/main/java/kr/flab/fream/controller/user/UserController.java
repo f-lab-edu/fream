@@ -3,6 +3,7 @@ package kr.flab.fream.controller.user;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import kr.flab.fream.domain.user.model.User;
 import kr.flab.fream.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.ObjectUtils;
@@ -51,5 +52,12 @@ public class UserController {
     public void logout(HttpSession session) {
         session.invalidate();
     }
+
+
+    @RequestMapping(value = "join")
+    public int joinUser(@Valid @NotNull @RequestBody User userInfo) {
+        return userService.signUpMember(userInfo);
+    }
 }
+
 

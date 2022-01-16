@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import kr.flab.fream.config.FormattingConfiguration
 import kr.flab.fream.config.ModelMapperConfiguration
 import kr.flab.fream.config.WebConfig
+import kr.flab.fream.domain.user.model.User
 import kr.flab.fream.domain.user.service.UserService
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
@@ -98,5 +99,44 @@ class UserControllerSpec extends Specification {
         then: "login filed with exception 'requir" +
                 "ed userInfo' "
         resultAction.andExpect(status().isUnauthorized())
+    }
+
+    def"joinUser"(){
+        given:"session has not attr userinfo"
+        def user = new User();
+        user.setEmail("test@gmil.com");
+        user.setAccount("test");
+        user.setName("mapperTest");
+        user.setPassword("ggggg");
+        user.setPhone("1234");
+
+        def requestBody = objectMapper.writeValueAsString(user)
+
+        when:"processing logout"
+        userService.userLogin(_ as User) >> {User userInfo -> 1}
+        def resultAction=mockMvc.perform(post("/user/join")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+
+        then: "login filed with exception 'requir" +
+                "ed userInfo' "
+        resultAction.andExpect(status().isOk())
+    }
+    def"failed joinUser"(){
+        given:"session has not attr userinfo"
+        def user = new User();
+        user.setEmail("test@gmil.com");
+        user.setAccount("test");
+
+        def requestBody = objectMapper.writeValueAsString(user)
+        userService.signUpMember(_ as User) >> {User userInfo -> 1}
+        when:"processing logout"
+        def resultAction=mockMvc.perform(post("/user/join")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+
+        then: "login filed with exception 'requir" +
+                "ed userInfo' "
+        resultAction.andExpect(status().isBadRequest())
     }
 }

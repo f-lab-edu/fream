@@ -7,6 +7,7 @@ import kr.flab.fream.controller.auction.AuctionDto;
 import kr.flab.fream.controller.auction.AuctionPatchRequest;
 import kr.flab.fream.controller.auction.AuctionRequest;
 import kr.flab.fream.controller.auction.AuctionSummaryByPriceAndSizeWithQuantity;
+import kr.flab.fream.domain.auction.AuctionLockManager;
 import kr.flab.fream.domain.auction.AuctionSearchOption;
 import kr.flab.fream.domain.auction.dto.SignAuctionResponse;
 import kr.flab.fream.domain.auction.model.Auction;
@@ -37,6 +38,7 @@ public class AuctionService {
     private final UserMapper userMapper;
     private final ProductService productService;
     private final ModelMapper modelMapper;
+    private final AuctionLockManager lockManager;
 
     /**
      * 입찰 목록을 조회한다.
@@ -76,6 +78,8 @@ public class AuctionService {
      * @return 입찰을 생성한 뒤 반환.
      */
     public AuctionDto createAuction(AuctionRequest request) {
+        lockManager.lock(request.getProductId(), request.getSizeId());
+
         Auction auction = request.getType().constructor.apply(request);
 
         Product product = productService.getProduct(request.getProductId());
@@ -126,7 +130,16 @@ public class AuctionService {
      * @param auctionId 입찰 ID
      */
     public SignAuctionResponse sign(User bidder, Long auctionId) {
+        Auction auction = auctionMapper.getAuction(auctionId);
+
+        lockManager.lock(auction.getProduct().getId(), auction.getSize().getId());
+
+        return signHelper(bidder, auctionId);
+    }
+
+    private SignAuctionResponse signHelper(User bidder, Long auctionId) {
         Auction auction = auctionMapper.getAuctionForUpdate(auctionId);
+
         auction.sign(bidder);
         auctionMapper.update(auction);
 

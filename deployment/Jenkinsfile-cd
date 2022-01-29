@@ -6,7 +6,6 @@ pipeline {
         IMAGE_REGISTRY_PORT = credentials('image-registry-port')
         FREAM_APP_SERVER_HOST = credentials('fream-app-server-host')
         FREAM_APP_SERVER_USER = credentials('fream-app-server-user')
-        IMAGE_NAME = 'fream'
     }
 
     stages {
@@ -19,6 +18,7 @@ pipeline {
                     expression { env.IMAGE_REGISTRY_PORT == null }
                     expression { env.FREAM_APP_SERVER_HOST == null }
                     expression { env.FREAM_APP_SERVER_USER == null }
+                    expression { env.SCRIPT_DIR == null }
                 }
             }
             steps {
@@ -64,7 +64,7 @@ pipeline {
         stage ('Deploy') {
             steps {
                 sshagent(credentials : ['fream-app-server-01-key']) {
-                    sh 'ssh -o StrictHostKeyChecking=no "$FREAM_APP_SERVER_USER@$FREAM_APP_SERVER_HOST" "~/020-deploy-fream.sh $FREAM_VERSION"'
+                    sh 'ssh -o StrictHostKeyChecking=no "$FREAM_APP_SERVER_USER@$FREAM_APP_SERVER_HOST" "cd $SCRIPT_DIR ; ./020-deploy-fream.sh $FREAM_VERSION"'
                 }
             }
         }

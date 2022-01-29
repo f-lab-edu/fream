@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # For Ubuntu 16.04
 

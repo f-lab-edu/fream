@@ -71,7 +71,7 @@ do
 	fi
 
 	echo "Retry Health Check after 5 seconds"
-	sleep 5
+	sleep 10
 done
 
 echo "set \$service_url http://${NEXT_ACTIVE_SET}:${NEXT_ACTIVE_PORT};" | sudo tee $NGINX_CONF_DIR/service-url.inc

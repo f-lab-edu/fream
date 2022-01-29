@@ -47,8 +47,8 @@ echo $NEXT_ACTIVE_SET
 docker run -d --name $NEXT_ACTIVE_SET -p $NEXT_ACTIVE_PORT:$NEXT_ACTIVE_PORT \
 	--network fream -e SERVER_PORT=$NEXT_ACTIVE_PORT                           \
 	-e SPRING_PROFILES_ACTIVE=prod -e FREAM_DB_URL=fream-mysql                 \
-	-e FREAM_DB_PORT=3306 -e FREAM_DB_SCHEME=fream                             \
-	-e FREAM_DB_USERNAME=test -e FREAM_DB_PASSWORD=test                        \
+	-e FREAM_DB_PORT=3306 -e FREAM_DB_SCHEME=$MYSQL_DATABASE                   \
+	-e FREAM_DB_USERNAME=$MYSQL_USER -e FREAM_DB_PASSWORD=$MYSQL_PASSWORD      \
 	-e TZ=Asia/Seoul $IMAGE_REGISTRY/fream:$FREAM_APP_VERSION
 
 ## Referenced by https://jojoldu.tistory.com/267

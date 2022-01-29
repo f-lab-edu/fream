@@ -1,0 +1,74 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_REGISTRY_HOST = credentials('image-registry-host')
+        IMAGE_REGISTRY_PORT = credentials('image-registry-port')
+        FREAM_APP_SERVER_HOST = credentials('fream-app-server-host')
+        FREAM_APP_SERVER_USER = credentials('fream-app-server-user')
+        IMAGE_NAME = 'fream'
+    }
+
+    stages {
+
+        stage('check env') {
+            when {
+                anyOf {
+                    expression { env.IMAGE_NAME == null }
+                    expression { env.IMAGE_REGISTRY_HOST == null }
+                    expression { env.IMAGE_REGISTRY_PORT == null }
+                    expression { env.FREAM_APP_SERVER_HOST == null }
+                    expression { env.FREAM_APP_SERVER_USER == null }
+                }
+            }
+            steps {
+                script {
+                    error 'Some required env are not set.'
+                }
+            }
+        }
+
+        stage('clone the project') {
+            steps {
+                git branch: 'main', url: 'https://github.com/f-lab-edu/fream.git'
+            }
+        }
+
+        stage('fetch a version') {
+            steps {
+                script {
+                    env.FREAM_VERSION = sh(returnStdout: true, script: ''' ./gradlew properties | grep \'^version:\\ \' | awk \'{print $2}\' ''').trim()
+                }
+            }
+        }
+
+        stage('create image') {
+            steps {
+                sh '''
+                    IMAGE_REGISTRY="$IMAGE_REGISTRY_HOST:$IMAGE_REGISTRY_PORT"
+
+                    ./gradlew clean bootJar
+
+                    docker build --build-arg FREAM_VERSION=$FREAM_VERSION --no-cache -t $IMAGE_REGISTRY/$IMAGE_NAME:$FREAM_VERSION .
+                    docker tag $IMAGE_REGISTRY/$IMAGE_NAME:$FREAM_VERSION $IMAGE_REGISTRY/$IMAGE_NAME:latest
+
+                    docker push $IMAGE_REGISTRY/$IMAGE_NAME:$FREAM_VERSION
+                    docker push $IMAGE_REGISTRY/$IMAGE_NAME:latest
+
+                    docker rmi $(docker images -f "dangling=true" -q) || true
+
+                '''
+            }
+        }
+
+        stage ('Deploy') {
+            steps {
+                sshagent(credentials : ['fream-app-server-01-key']) {
+                    sh 'ssh -o StrictHostKeyChecking=no "$FREAM_APP_SERVER_USER@$FREAM_APP_SERVER_HOST" "~/020-deploy-fream.sh $FREAM_VERSION"'
+                }
+            }
+        }
+
+    }
+
+}

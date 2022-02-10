@@ -51,7 +51,7 @@
                a.is_default AS is_default,
           a.alias AS a
         FROM  user AS u
-                  JOIN address AS a ON u.id = a.user_id
+                  LEFT OUTER JOIN address AS a ON u.id = a.user_id
         WHERE u.email = #{email}
     </select>
 

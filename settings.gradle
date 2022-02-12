@@ -1,1 +1,3 @@
 rootProject.name = 'kr.flab.fream'
+
+include 'product-service'

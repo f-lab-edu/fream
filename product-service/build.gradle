@@ -67,3 +67,14 @@ tasks.named('asciidoctor') {
     inputs.dir snippetsDir
     dependsOn test
 }
+
+jar {
+    enabled = false
+}
+
+bootJar {
+    layered {
+        includeLayerTools = true
+    }
+    archiveFileName = "fream-product-service.jar"
+}

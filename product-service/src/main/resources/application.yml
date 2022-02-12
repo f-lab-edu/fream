@@ -2,12 +2,19 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:local}
   datasource:
-    url: jdbc:mysql://${FREAM_DB_URL:localhost}:${FREAM_DB_PORT:3306}/${FREAM_DB_SCHEME:fream-product}?useSSL=false
-    username: ${FREAM_DB_USERNAME}
-    password: ${FREAM_DB_PASSWORD}
+    url: jdbc:mysql://${FREAM_DB_URL:localhost}:${FREAM_DB_PORT:3306}/${FREAM_DB_SCHEME:fream-product}?allowPublicKeyRetrieval=true&useSSL=false
+    username: ${FREAM_DB_USERNAME:test}
+    password: ${FREAM_DB_PASSWORD:test}
   flyway:
-    schemas: fream
+    schemas: fream-product
     locations:
       - classpath:db/migration
+  zipkin:
+    base-url: ${ZIPKIN_BASE_URL:http://zipkin:9411/}
+    service:
+      name: fream-product-service
+  sleuth:
+    sampler:
+      probability: 1.0
 server:
   port: ${SERVER_PORT:8080}

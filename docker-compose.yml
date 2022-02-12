@@ -1,0 +1,53 @@
+version: "3.9"
+services:
+  zipkin:
+    image: openzipkin/zipkin-slim
+    ports:
+      - "9411:9411"
+    environment:
+      TZ: Asia/Seoul
+    networks:
+      - fream-default
+
+  product-service:
+    build: product-service
+    image: fream-product-service
+    ports:
+      - "8180:8080"
+    depends_on:
+      - zipkin
+      - product-service-db
+    links:
+      - zipkin:zipkin
+      - product-service-db:fream-product-service-db
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      TZ: Asia/Seoul
+      FREAM_DB_URL: fream-product-service-db
+      FREAM_DB_USERNAME: test
+      FREAM_DB_PASSWORD: test
+    restart: always
+    networks:
+      - fream-default
+      - product-service
+
+  product-service-db:
+    image: mysql:8
+    platform: linux/amd64
+    ports:
+      - "33310:3306"
+    environment:
+      TZ: Asia/Seoul
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+      MYSQL_DATABASE: fream-product
+    command: mysqld --default-authentication-plugin=mysql_native_password --ngram-token-size=2
+    networks:
+      - product-service
+
+networks:
+  fream-default:
+    name: fream
+  product-service:
+    name: fream-product-service

@@ -11,6 +11,12 @@ VALUES( 1,
         "testUser2",
         "test@test2.com",
         "01012345678",
+        "123456789"),
+      ( 3,
+        "$2a$10$ZzUvLsoz706ydok7Tmd/I.iQdUyPKdyBL4KPZ8BdS17wlOXGcsF6a",
+        "noAdressUser",
+        "no@adress.com",
+        "01012345678",
         "123456789");
 
 

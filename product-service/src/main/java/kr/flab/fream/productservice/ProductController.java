@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/products")
 public class ProductController {
 
-    @GetMapping("/")
+    @GetMapping
     public String get() {
         return "Sneakers";
     }

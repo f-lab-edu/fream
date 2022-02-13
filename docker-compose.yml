@@ -1,5 +1,45 @@
 version: "3.9"
 services:
+  es:
+    image: elasticsearch:7.17.0
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      TZ: Asia/Seoul
+      discovery.type: single-node
+    networks:
+      - fream-default
+
+  kibana:
+    image: kibana:7.17.0
+    ports:
+      - "5601:5601"
+    depends_on:
+      - es
+    links:
+      - es:es
+    environment:
+      TZ: Asia/Seoul
+      ELASTICSEARCH_HOSTS: '["http://es:9200"]'
+    networks:
+      - fream-default
+
+  fluentd:
+    build: fluentd
+    image: fream-fluentd
+    volumes:
+      - ./fluentd/conf:/fluentd/etc
+    links:
+      - es:es
+    depends_on:
+      - es
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    networks:
+      - fream-default
+
   zipkin:
     image: openzipkin/zipkin-slim
     ports:
@@ -20,6 +60,7 @@ services:
     links:
       - zipkin:zipkin
       - product-service-db:fream-product-service-db
+      - fluentd:fluentd
     environment:
       SPRING_PROFILES_ACTIVE: local
       TZ: Asia/Seoul
@@ -30,6 +71,11 @@ services:
     networks:
       - fream-default
       - product-service
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: product-service
 
   product-service-db:
     image: mysql:8

@@ -109,6 +109,7 @@ dependencies {
 	implementation 'org.modelmapper:modelmapper:2.4.4'
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 	implementation 'org.mindrot:jbcrypt:0.4'
+	implementation 'org.springframework.session:spring-session-jdbc'
 
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'

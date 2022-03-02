@@ -5,10 +5,13 @@ import kr.flab.fream.mybatis.util.exception.NoAuthenticationException;
 import lombok.Builder;
 import lombok.Value;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 
@@ -50,6 +53,28 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(errorResponse, httpStatus);
     }
+
+    /**
+     * 
+     * MethodArgumentNotValid오류 핸들링을 위한 메소드
+     * @param ex
+     * @param headers
+     * @param status
+     * @param request
+     * @return ResponseEntity
+     */
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+        MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status,
+        WebRequest request) {
+        final var errorResponse = ErrorResponse.builder()
+            .timestamp(LocalDateTime.now())
+            .status(status.value())
+            .error(ex.getMessage())
+            .build();
+        return new ResponseEntity((Object)errorResponse,status);
+    }
+
     /**
      * 글로벌 예외가 발생할 때 사용할 DTO 객체.
      *

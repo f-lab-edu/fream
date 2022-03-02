@@ -1,6 +1,7 @@
 package kr.flab.fream.controller;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import kr.flab.fream.mybatis.util.exception.NoAuthenticationException;
 import lombok.Builder;
 import lombok.Value;
@@ -8,6 +9,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -67,12 +71,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status,
         WebRequest request) {
+        List<FieldError> errList = ex.getBindingResult().getFieldErrors();
+        StringBuffer errMessage = new StringBuffer();
+
+        for(FieldError err : errList){
+            errMessage.append(err.getDefaultMessage())
+                .append(" ");
+        }
+
         final var errorResponse = ErrorResponse.builder()
             .timestamp(LocalDateTime.now())
             .status(status.value())
-            .error(ex.getMessage())
+            .error(errMessage.toString())
             .build();
-        return new ResponseEntity((Object)errorResponse,status);
+        return handleExceptionInternal(ex,errorResponse,headers,status,request);
     }
 
     /**

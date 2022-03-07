@@ -54,7 +54,7 @@ public class UserController {
     }
 
 
-    @RequestMapping(value = "join")
+    @RequestMapping(value = "/join")
     public int joinUser(@Valid @NotNull @RequestBody User userInfo) {
         return userService.signUpMember(userInfo);
     }

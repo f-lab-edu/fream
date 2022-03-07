@@ -36,6 +36,7 @@ public class User {
     @NotNull
     String account;
     @Email
+    @NotNull
     String email;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
